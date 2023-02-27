@@ -3,6 +3,7 @@ class Link
   include Mongoid::Timestamps
 
   belongs_to :message
+  has_many :tagships, dependent: :destroy
 
   field :url, type: String
   field :data, type: Hash
@@ -16,5 +17,11 @@ class Link
       url: :url,
       data: { type: :text_area, disabled: true }
     }
+  end
+
+  after_create do
+    Tag.all.each do |tag|
+      tagships.create(tag: tag) if %w[title description].any? { |f| data[f] && data[f].include?(tag.name) }
+    end
   end
 end
