@@ -40,8 +40,13 @@ module Radar
       erb :not_found, layout: :application
     end
 
-    get '/', provides: :json do
-      { hello: 'world' }.to_json
+    get '/invite' do
+      bot = Discordrb::Bot.new(token: ENV['DISCORD_BOT_TOKEN'])
+      bot.invite_url(permission_bits: 1024)
+    end
+
+    get '/links', provides: :json do
+      Link.first(10).to_json
     end
   end
 end

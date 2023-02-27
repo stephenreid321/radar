@@ -60,6 +60,10 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     erubi (1.12.0)
     event_emitter (0.2.6)
+    faraday (2.7.4)
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-net_http (3.0.2)
     ffi (1.15.5)
     http-accept (1.7.0)
     http-cookie (1.0.5)
@@ -221,6 +225,7 @@ DEPENDENCIES
   bcrypt
   delayed_job_mongoid
   discordrb
+  faraday
   irb
   mechanize
   mongoid (~> 7.0)
