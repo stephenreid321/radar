@@ -48,9 +48,20 @@ GEM
     delayed_job_mongoid (3.0.0)
       delayed_job (>= 3.0, < 5)
       mongoid (>= 5.0)
+    discordrb (3.4.0)
+      discordrb-webhooks (~> 3.3.0)
+      ffi (>= 1.9.24)
+      opus-ruby
+      rest-client (>= 2.0.0)
+      websocket-client-simple (>= 0.3.0)
+    discordrb-webhooks (3.3.0)
+      rest-client (>= 2.1.0.rc1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     erubi (1.12.0)
+    event_emitter (0.2.6)
+    ffi (1.15.5)
+    http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
     i18n (1.12.0)
@@ -102,10 +113,13 @@ GEM
       timeout
     net-smtp (0.3.3)
       net-protocol
+    netrc (0.11.0)
     nio4r (2.5.8)
     nokogiri (1.14.2)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
+    opus-ruby (1.0.1)
+      ffi
     padrino (0.15.3)
       padrino-admin (= 0.15.3)
       padrino-cache (= 0.15.3)
@@ -153,6 +167,11 @@ GEM
     regexp_parser (2.7.0)
     reline (0.3.2)
       io-console (~> 0.5)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     rexml (3.2.5)
     rubocop (1.46.0)
       json (~> 2.3)
@@ -185,6 +204,10 @@ GEM
     unicode-display_width (2.4.2)
     webrick (1.8.1)
     webrobots (0.1.2)
+    websocket (1.2.9)
+    websocket-client-simple (0.6.0)
+      event_emitter
+      websocket
 
 PLATFORMS
   ruby
@@ -195,6 +218,7 @@ DEPENDENCIES
   airbrake
   bcrypt
   delayed_job_mongoid
+  discordrb
   irb
   mechanize
   mongoid (~> 7.0)

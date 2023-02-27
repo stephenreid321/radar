@@ -17,4 +17,6 @@ gem 'bcrypt'
 gem 'delayed_job_mongoid'
 gem 'mechanize'
 gem 'mongoid', '~> 7.0'
+gem 'discordrb'
 gem 'rubocop'
+

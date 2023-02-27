@@ -35,7 +35,7 @@ module Radar
     end
 
     get '/', provides: :json do
-      {}.to_json
+      { hello: 'world' }.to_json
     end
   end
 end
