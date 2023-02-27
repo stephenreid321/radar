@@ -48,5 +48,17 @@ module Radar
     get '/links', provides: :json do
       Link.first(10).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
+
+    get '/tags', provides: :json do
+      Tag.all.as_json.to_json
+    end
+
+    get '/edges', provides: :json do
+      Edge.where(:weight.gt => 0).as_json.to_json
+    end
+
+    get '/graph' do
+      erb :graph
+    end
   end
 end

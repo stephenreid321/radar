@@ -3,7 +3,9 @@ class Link
   include Mongoid::Timestamps
 
   belongs_to :message
+
   has_many :tagships, dependent: :destroy
+  has_many :edgeships, dependent: :destroy
 
   field :url, type: String
   field :data, type: Hash
@@ -13,15 +15,18 @@ class Link
 
   def self.admin_fields
     {
-      message_id: :lookup,
       url: :url,
-      data: { type: :text_area, disabled: true }
+      data: { type: :text_area, disabled: true },
+      message_id: :lookup
     }
   end
 
   after_create do
     Tag.all.each do |tag|
-      tagships.create(tag: tag) if %w[title description].any? { |f| data[f] && data[f].include?(tag.name) }
+      tagships.create(tag: tag) if %w[title description].any? { |f| data[f] && data[f].match(/#{tag.name}/i) }
+    end
+    Edge.all.each do |edge|
+      edgeships.create(edge: edge) if tagships.where(tag: edge.source).exists? && tagships.where(tag: edge.sink).exists?
     end
   end
 end

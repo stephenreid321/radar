@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <% {
+         'jquery/3.2.0' => 'jquery.min.js',
+         'cytoscape/3.9.4' => 'cytoscape.min.js',
+         'chroma-js/2.0.6' => 'chroma.min.js',
+       }.each { |k,v| %>
+    <% v.split(' ').each { |f| u = "https://cdnjs.cloudflare.com/ajax/libs/#{k}/#{f}" %>
+    <% case f.split('.').last.to_sym; when :js %>
+    <script src="<%= u %>"></script>
+    <% when :css %>
+    <link rel="stylesheet" href="<%= u %>">
+  <% end %>
+  <% } %>
+  <% } %>
+
+  <% [
+       '//rawcdn.githack.com/tgdwyer/WebCola/aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola/cola.min.js',
+       '//rawcdn.githack.com/cytoscape/cytoscape.js-cola/8c78f9d5c11ff6162b7d902f0639e1f787277b9f/cytoscape-cola.js',
+     ].each { |f| %>
+  <script src="<%= f %>"></script>
+  <% } %>
+
+  <style>
+    html, body, #cy { height: 100%; }
+  </style>
+</head>
+<body>
+  <%= yield %>
+</body>
+</html>

@@ -20,4 +20,6 @@ gem 'faraday'
 gem 'mechanize'
 gem 'mongoid', '~> 7.0'
 gem 'rack-cors'
+gem 'htmlbeautifier'
 gem 'rubocop'
+

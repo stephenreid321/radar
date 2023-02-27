@@ -1,18 +1,18 @@
-class Tagship
+class Edgeship
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  belongs_to :tag
+  belongs_to :edge
   belongs_to :link
 
   def self.admin_fields
     {
-      tag_id: :lookup,
+      edge_id: :lookup,
       link_id: :lookup
     }
   end
 
   after_save do
-    tag.update_attribute(:weight, tag.tagships.count)
+    edge.update_attribute(:weight, edge.edgeships.count)
   end
 end
