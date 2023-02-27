@@ -19,4 +19,4 @@ gem 'mechanize'
 gem 'mongoid', '~> 7.0'
 gem 'discordrb'
 gem 'rubocop'
-
+gem 'rack-cors'
