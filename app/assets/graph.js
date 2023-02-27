@@ -51,7 +51,7 @@ function drawNetwork() {
 
   cy = cytoscape({
 
-    container: $('#cy'),
+    container: $(GRAPH_SELECTOR),
     elements: tag_data.concat(edge_data),
     style: [
       {
