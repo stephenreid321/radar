@@ -46,7 +46,7 @@ module Radar
     end
 
     get '/links', provides: :json do
-      Link.first(10).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      Link.all.as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', provides: :json do
