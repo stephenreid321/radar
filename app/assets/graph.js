@@ -1,4 +1,5 @@
 tags = []
+console.log(`${BASE_URI}/tags`)
 $.get(`${BASE_URI}/tags`, function (data) {
   tags = data
 });
