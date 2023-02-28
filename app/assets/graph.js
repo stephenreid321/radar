@@ -105,7 +105,10 @@ function drawNetwork() {
   });
 
   cy.on('tap', 'node', function () {
-    window.location.href = `/?${$.param({ tag: this.data('name'), q: q })}`
+    if (this.data('name') == urlParams.get('tag'))
+      window.location.href = `/?${$.param({ q: q })}`
+    else
+      window.location.href = `/?${$.param({ tag: this.data('name'), q: q })}`
   });
   cy.on('tap', 'edge', function () {
     window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
