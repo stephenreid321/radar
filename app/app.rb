@@ -61,7 +61,7 @@ module Radar
           { 'data.description': /\b#{params[:q]}\b/i }
         ).pluck(:id))
       end
-      links.first(50).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      links.first(20).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', provides: :json do

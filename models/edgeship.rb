@@ -2,8 +2,8 @@ class Edgeship
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  belongs_to :edge
-  belongs_to :link
+  belongs_to :edge, index: true
+  belongs_to :link, index: true
 
   def self.admin_fields
     {

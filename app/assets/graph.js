@@ -11,7 +11,7 @@ function drawNetwork() {
 
   edge_min_color = 1
   edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight; }))
-  edge_min_opacity = 0.25
+  edge_min_opacity = 0.15
   edge_opacity_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight; }))
 
   tag_ids = $.map(tags, function (tag, i) {

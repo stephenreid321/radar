@@ -2,7 +2,7 @@ class Link
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  belongs_to :message
+  belongs_to :message, index: true
 
   has_many :tagships, dependent: :destroy
   has_many :edgeships, dependent: :destroy

@@ -2,8 +2,8 @@ class Tagship
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  belongs_to :tag
-  belongs_to :link
+  belongs_to :tag, index: true
+  belongs_to :link, index: true
 
   def self.admin_fields
     {
@@ -18,5 +18,4 @@ class Tagship
   def update_tag_weight
     tag.update_attribute(:weight, tag.tagships.count)
   end
-
 end

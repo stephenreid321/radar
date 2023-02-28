@@ -1,9 +1,10 @@
 development:
   clients:
     default:
-      database: <%= File.basename(PADRINO_ROOT) %>
-      hosts:
-        - localhost:27017
+      uri: <%= ENV['MONGODB_URI'] || ENV['MONGO_URL'] %>
+      # database: <%= File.basename(PADRINO_ROOT) %>
+      # hosts:
+        # - localhost:27017
         
 test:
   clients:
