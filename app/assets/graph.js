@@ -97,12 +97,12 @@ function drawNetwork() {
   cy.on('mouseout', 'node', function (e) {
     $('.full-screen').css('cursor', 'default');
   });
-  cy.on('mouseover', 'edge', function (e) {
-    $('.full-screen').css('cursor', 'pointer');
-  });
-  cy.on('mouseout', 'edge', function (e) {
-    $('.full-screen').css('cursor', 'default');
-  });
+  // cy.on('mouseover', 'edge', function (e) {
+  //   $('.full-screen').css('cursor', 'pointer');
+  // });
+  // cy.on('mouseout', 'edge', function (e) {
+  //   $('.full-screen').css('cursor', 'default');
+  // });
 
   cy.on('tap', 'node', function () {
     if (this.data('name') == urlParams.get('tag'))
@@ -110,9 +110,9 @@ function drawNetwork() {
     else
       window.location.href = `/?${$.param({ tag: this.data('name'), q: q })}`
   });
-  cy.on('tap', 'edge', function () {
-    window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
-  });
+  // cy.on('tap', 'edge', function () {
+  //   window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
+  // });
   cy.minZoom(0.5)
 
 }
