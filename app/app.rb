@@ -118,6 +118,7 @@ module Radar
 
     post '/tags', provides: :json do
       Tag.find_or_create_by!(name: params[:name]).to_json
+      Radar::App.cache.clear
     end
 
     get '/discover' do
