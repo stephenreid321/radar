@@ -58,7 +58,7 @@ class Message
       channel_name = channel['name']
 
       JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).each do |message_data|
-        Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data) unless message_data['embeds'].empty?
+        Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data)
       end
     end
     tags = Tag.all
