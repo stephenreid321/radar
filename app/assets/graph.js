@@ -122,11 +122,12 @@ $(function () {
   urlParams = new URLSearchParams(window.location.search);
   q = urlParams.get('q')
   tag = urlParams.get('tag')
+  channel = urlParams.get('channel')
 
   tags = []
   edges = []
 
-  $.get(`${BASE_URI}/tags?${$.param({ tag: tag, q: q })}`, function (data) {
+  $.get(`${BASE_URI}/tags?${$.param({ channel: channel, tag: tag, q: q })}`, function (data) {
     tags = data
     $.each(tags, function (i, tag) {
       edges.push(...tag['edges_as_source'])

@@ -49,32 +49,61 @@ module Radar
       bot.invite_url(permission_bits: 1024)
     end
 
+    get '/channels', cache: true, provides: :json do
+      cache_key { 'channels' }
+      Message.distinct(:channel_id).map do |channel_id|
+        channel_name = Message.where(channel_id: channel_id).first.channel_name
+        {
+          name: channel_name,
+          id: channel_id,
+          tags: Tag.where(:id.in =>
+            Tagship.where(:link_id.in =>
+              Link.where(:message_id.in =>
+                Message.where(channel_id: channel_id).pluck(:id)).pluck(:id)).pluck(:tag_id)).pluck(:name)
+        }
+      end.select { |channel| channel[:tags].any? }.to_json
+    end
+
     get '/links', cache: true, provides: :json do
-      cache_key { "links-#{params[:tag]}-#{params[:q]}" }
+      cache_key { "links-#{params[:channel]}-#{params[:tag]}-#{params[:q]}" }
       links = if params[:tag]
                 Link.where(:id.in => Tagship.where(tag: Tag.find_by(name: params[:tag])).pluck(:link_id))
               else
                 Link.all
               end
+      if params[:channel]
+        links = links.where(:message_id.in => Message.where(
+          channel_id: params[:channel]
+        ).pluck(:id))
+      end
       if params[:q]
         links = links.where(:id.in => Link.or(
           { 'data.title': /\b#{params[:q]}\b/i },
           { 'data.description': /\b#{params[:q]}\b/i }
         ).pluck(:id))
       end
-      links.first(20).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      links.as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', cache: true, provides: :json do
-      cache_key { "tags-#{params[:tag]}-#{params[:q]}" }
+      cache_key { "tags-#{params[:channel]}-#{params[:tag]}-#{params[:q]}" }
       tags = if params[:tag]
                tag = Tag.find_by(name: params[:tag])
                Tag.where(:id.in => [tag.id] + tag.edges_as_source.where(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.where(:weight.gt => 0).pluck(:source_id))
              else
                Tag.all
              end
+      if params[:channel]
+        tags = tags.where(
+          :id.in => Tagship.where(:link_id.in => Link.where(
+            :message_id.in => Message.where(
+              channel_id: params[:channel]
+            ).pluck(:id)
+          ).pluck(:id)).pluck(:tag_id)
+        )
+      end
       if params[:q]
-        tags = Tag.where(
+        tags = tags.where(
           :id.in => Tagship.where(:link_id.in => Link.or(
             { 'data.title': /\b#{params[:q]}\b/i },
             { 'data.description': /\b#{params[:q]}\b/i }

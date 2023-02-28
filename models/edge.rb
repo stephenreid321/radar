@@ -32,9 +32,19 @@ class Edge
     edge
   end
 
-  after_create do
-    Link.where(:id.in => source.tagships.pluck(:link_id) & sink.tagships.pluck(:link_id)).each do |link|
-      edgeships.create(link: link)
+  def update_weight
+    update_attribute(:weight, edgeships.count)
+  end
+
+  def links
+    Link.where(:id.in => source.tagships.pluck(:link_id) & sink.tagships.pluck(:link_id))
+  end
+
+  after_create :create_edgeships
+  def create_edgeships
+    links.each do |link|
+      edgeships.create(link: link, skip_update_weight: true)
     end
+    update_weight
   end
 end

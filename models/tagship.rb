@@ -5,6 +5,10 @@ class Tagship
   belongs_to :tag, index: true
   belongs_to :link, index: true
 
+  validates_uniqueness_of :tag, scope: :link
+
+  attr_accessor :skip_update_weight
+
   def self.admin_fields
     {
       tag_id: :lookup,
@@ -12,10 +16,10 @@ class Tagship
     }
   end
 
-  after_create :update_tag_weight
-  after_destroy :update_tag_weight
+  after_create :update_tag_weight, unless: -> { skip_update_weight }
+  after_destroy :update_tag_weight, unless: -> { skip_update_weight }
 
   def update_tag_weight
-    tag.update_attribute(:weight, tag.tagships.count)
+    tag.update_weight
   end
 end

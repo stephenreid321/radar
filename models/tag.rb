@@ -19,13 +19,27 @@ class Tag
     }
   end
 
-  after_create do
+  def update_weight
+    update_attribute(:weight, tagships.count)
+  end
+
+  def links
     Link.or(
       { 'data.title': /\b#{name}\b/i },
       { 'data.description': /\b#{name}\b/i }
-    ).each do |link|
-      tagships.create(link: link)
+    )
+  end
+
+  after_create :create_tagships
+  def create_tagships
+    links.each do |link|
+      tagships.create(link: link, skip_update_weight: true)
     end
+    update_weight
+  end
+
+  after_create :create_edges
+  def create_edges
     Tag.all.each do |sink|
       Edge.find_or_create(self, sink)
     end
