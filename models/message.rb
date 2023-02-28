@@ -35,6 +35,7 @@ class Message
       puts "thread #{i + 1}/#{threads.count}: #{m} messages"
       c += m
     end
+    c
   end
 
   def self.populate!
