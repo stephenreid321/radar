@@ -41,6 +41,10 @@ $(function () {
         var tag = resourceBlock.find('.tags').first().clone()
         tag.click(function () { window.location.href = `/?tag=${tagship['tag']['name']}` }).css('cursor', 'pointer')
         tag.text(tagship['tag']['name'])
+        if (tagship['tag']['name'] == urlParams.get('tag')) {
+          tag.css('border-color', '#A706FA')
+          tag.css('background-color', chroma('#A706FA').alpha(0.1).css())
+        }
         tag.appendTo(resourceBlock.find('.list-item-2')).show()
       })
 
