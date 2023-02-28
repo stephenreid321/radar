@@ -26,7 +26,6 @@ class Edge
 
   def self.find_or_create(source, sink)
     if !(edge = find_by(source: source, sink: sink)) && !(edge = find_by(source: sink, sink: source)) && source != sink
-      puts "creating edge for #{source.name} - #{sink.name}"
       edge = create(source: source, sink: sink)
     end
     edge

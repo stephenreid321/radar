@@ -37,9 +37,10 @@ class Message
   def self.active_thread_count
     c = 0
     threads = JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads']
+    tc = threads.count
     threads.each_with_index do |thread, i|
       m = JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).count
-      puts "thread #{i + 1}/#{threads.count}: #{m} messages"
+      puts "thread #{i + 1}/#{tc}: #{m} messages"
       c += m
     end
     c
@@ -48,14 +49,11 @@ class Message
   def self.populate(n = nil)
     threads = JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads']
     threads = threads[0..n - 1] if n
-    threads.each do |thread|
-      puts "thread #{thread['id']}"
+    tc = threads.count
+    threads.each_with_index do |thread, i|
+      puts "thread #{i + 1}/#{tc}"
       channel = thread
-      puts "initial type #{channel['type']}"
-      while [10, 11, 12].include?(channel['type'])
-        channel = JSON.parse(DISCORD.get("channels/#{thread['parent_id']}").body)
-        puts "type #{channel['type']}"
-      end
+      channel = JSON.parse(DISCORD.get("channels/#{thread['parent_id']}").body) while [10, 11, 12].include?(channel['type'])
       channel_id = thread['parent_id']
       channel_name = channel['name']
 
@@ -63,12 +61,16 @@ class Message
         Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data) unless message_data['embeds'].empty?
       end
     end
-    Tag.all.each do |tag|
-      puts "tag #{tag.name}"
+    tags = Tag.all
+    c = tags.count
+    tags.each_with_index do |tag, i|
+      puts "tag #{i + 1}/#{c}: #{tag.name}"
       tag.create_tagships
     end
-    Edge.all.each do |edge|
-      puts "edge #{edge.source.name} -> #{edge.sink.name}"
+    edges = Edge.all
+    c = edges.count
+    edges.each_with_index do |edge, i|
+      puts "edge #{i + 1}/#{c}: #{edge.summary}"
       edge.create_edgeships
     end
   end
