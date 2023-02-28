@@ -6,7 +6,7 @@ module Radar
     register Padrino::Cache
     helpers Activate::ParamHelpers
 
-    enable :caching unless Padrino.env == :development
+    enable :caching
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     set :public_folder, Padrino.root('app', 'assets')
     use Rack::Cors do
@@ -49,7 +49,8 @@ module Radar
       bot.invite_url(permission_bits: 1024)
     end
 
-    get '/links', provides: :json do
+    get '/links', cache: true, provides: :json do
+      cache_key { "links-#{params[:tag]}-#{params[:q]}" }
       links = if params[:tag]
                 Link.where(:id.in => Tagship.where(tag: Tag.find_by(name: params[:tag])).pluck(:link_id))
               else
@@ -64,7 +65,8 @@ module Radar
       links.first(20).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
-    get '/tags', provides: :json do
+    get '/tags', cache: true, provides: :json do
+      cache_key { "tags-#{params[:tag]}-#{params[:q]}" }
       tags = if params[:tag]
                tag = Tag.find_by(name: params[:tag])
                Tag.where(:id.in => [tag.id] + tag.edges_as_source.where(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.where(:weight.gt => 0).pluck(:source_id))
