@@ -24,6 +24,13 @@ class Message
     }
   end
 
+  def posted_at
+    binary_str = discord_id.to_i.to_s(2).rjust(64, '0')
+    timestamp_bits = binary_str[0...42]
+    timestamp = timestamp_bits.to_i(2) + 1_420_070_400_000
+    Time.at(timestamp / 1000.0)
+  end
+
   before_validation do
     errors.add(:data, 'must have embeds') if data['embeds'].empty?
   end

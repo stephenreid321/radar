@@ -6,7 +6,7 @@ module Radar
     register Padrino::Cache
     helpers Activate::ParamHelpers
 
-    enable :caching
+    enable :caching unless Padrino.env == :development
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     set :public_folder, Padrino.root('app', 'assets')
     use Rack::Cors do
@@ -61,7 +61,10 @@ module Radar
               Link.where(:message_id.in =>
                 Message.where(channel_id: channel_id).pluck(:id)).pluck(:id)).pluck(:tag_id)).pluck(:name)
         }
-      end.select { |channel| channel[:tags].any? }.to_json
+      end
+             .select { |channel| channel[:tags].any? }
+             .sort_by { |channel| channel[:name] }
+             .to_json
     end
 
     get '/links', cache: true, provides: :json do
@@ -69,7 +72,7 @@ module Radar
       links = if params[:tag]
                 Link.where(:id.in => Tagship.where(tag: Tag.find_by(name: params[:tag])).pluck(:link_id))
               else
-                Link.all
+                Link.order('posted_at desc')
               end
       if params[:channel]
         links = links.where(:message_id.in => Message.where(
@@ -82,7 +85,7 @@ module Radar
           { 'data.description': /\b#{params[:q]}\b/i }
         ).pluck(:id))
       end
-      links.first(50).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      links.limit(50).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', cache: true, provides: :json do

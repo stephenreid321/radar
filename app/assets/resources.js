@@ -22,6 +22,7 @@ $(function () {
     $('.tags-divider').show()
   }
 
+  $('<div class="category-blocks"></div>').insertAfter('.search-bar-div')
   $('.category-block').hide()
   $.get(`${BASE_URI}/channels`, function (data) {
     $(data).each(function (i, channel) {
@@ -72,7 +73,7 @@ $(function () {
         tag.appendTo(categoryBlock.find('.pricing-feature-list')).show()
       })
 
-      categoryBlock.insertAfter('.search-bar-div').show()
+      categoryBlock.appendTo('.category-blocks').show()
     })
   })
 
