@@ -50,10 +50,18 @@ module Radar
     end
 
     get '/links', provides: :json do
-      Link.or(
-        { 'data.title': /\b#{params[:q]}\b/i },
-        { 'data.description': /\b#{params[:q]}\b/i }
-      ).first(10).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      links = if params[:tag] && params[:tag] != 'null'
+                Link.where(:id.in => Tagship.where(tag: Tag.find_by(name: params[:tag])).pluck(:link_id))
+              else
+                Link.all
+              end
+      if params[:q] && params[:q] != 'null'
+        links = links.or(
+          { 'data.title': /\b#{params[:q]}\b/i },
+          { 'data.description': /\b#{params[:q]}\b/i }
+        )
+      end
+      links.first(10).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', provides: :json do

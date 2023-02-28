@@ -1,9 +1,16 @@
 $(function () {
 
+
+  // TODO
+  $('.tags-divider').hide()
+  $('.category-block').hide()
+  $('.categories').css('height', 'auto')
+
   $('.resources-block').hide()
 
   urlParams = new URLSearchParams(window.location.search);
   var q = urlParams.get('q')
+  var tag = urlParams.get('tag')
 
   var searchForm = $('<form style="height: 100%"><input name="q" type="text" style="padding-left: 0.5em; width: 100%; height: 100%" /></form>')
   searchForm.find('input').val(q)
@@ -11,7 +18,7 @@ $(function () {
   searchForm.appendTo('.search-bar-div')
   $('.search-bar-div').css('padding', 0)
 
-  $.get(`${BASE_URI}/links?q=${q}`, function (data) {
+  $.get(`${BASE_URI}/links?tag=${tag}&q=${q}`, function (data) {
     $(data).each(function (i, link) {
       var resourceBlock = $('.resources-block').first().clone()
 
@@ -29,6 +36,7 @@ $(function () {
       resourceBlock.find('.tags').hide()
       $(link['tagships']).each(function (i, tagship) {
         var tag = resourceBlock.find('.tags').first().clone()
+        tag.click(function () { window.location.href = `/?tag=${tagship['tag']['name']}` })
         tag.text(tagship['tag']['name'])
         tag.appendTo(resourceBlock.find('.list-item-2')).show()
       })
