@@ -23,10 +23,10 @@ class Link
 
   after_create do
     Tag.all.each do |tag|
-      tagships.create(tag: tag) if %w[title description].any? { |f| data[f] && data[f].match(/#{tag.name}/i) }
+      tagships.create(tag: tag) if %w[title description].any? { |f| data[f] && data[f].match(/\b#{tag.name}\b/i) }
     end
     Edge.all.each do |edge|
-      edgeships.create(edge: edge) if tagships.where(tag: edge.source).exists? && tagships.where(tag: edge.sink).exists?
+      edgeships.create(edge: edge) if tagships.find_by(tag: edge.source) && tagships.find_by(tag: edge.sink)
     end
   end
 end

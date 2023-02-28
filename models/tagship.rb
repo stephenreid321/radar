@@ -12,7 +12,11 @@ class Tagship
     }
   end
 
-  after_save do
+  after_create :update_tag_weight
+  after_destroy :update_tag_weight
+
+  def update_tag_weight
     tag.update_attribute(:weight, tag.tagships.count)
   end
+
 end

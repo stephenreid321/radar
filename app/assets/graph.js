@@ -1,28 +1,22 @@
-tags = []
-console.log(`${BASE_URI}/tags`)
-$.get(`${BASE_URI}/tags`, function (data) {
-  tags = data
-});
-
-
-edges = []
-$.get(`${BASE_URI}/edges`, function (data) {
-  edges = data
-});
-
 function drawNetwork() {
 
-  scale = chroma.scale(['#6D71C6', '#B16DC6']);
+  scale = chroma.scale(['#fff', '#999']);
 
   node_min_width = 10
   node_width_multiplier = 10
-  node_min_color = 0.1
+  node_min_color = 0.25
   node_color_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight; }))
-  edge_min_color = 0
+  node_min_opacity = 1
+  node_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight; }))
+
+  edge_min_color = 1
   edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight; }))
-  edge_min_opacity = 0
+  edge_min_opacity = 0.25
   edge_opacity_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight; }))
 
+  tag_ids = $.map(tags, function (tag, i) {
+    return tag._id['$oid']
+  })
 
   tag_data = $.map(tags, function (tag, i) {
     return {
@@ -31,35 +25,40 @@ function drawNetwork() {
         name: tag.name,
         weight: tag.weight,
         width: (node_min_width + ((node_min_width * node_width_multiplier) * tag.weight / node_color_scale)),
-        color: scale(node_min_color + (tag.weight / node_color_scale)).hex()
+        color: scale(node_min_color + (tag.weight / node_color_scale)).hex(),
+        opacity: node_min_opacity + (tag.weight / node_opacity_scale)
       }
     }
   })
 
   edge_data = $.map(edges, function (edge, i) {
-    return {
-      data: {
-        id: edge._id['$oid'],
-        source: edge.source_id['$oid'],
-        target: edge.sink_id['$oid'],
-        weight: edge.weight,
-        color: scale(edge_min_color + edge.weight / edge_color_scale).hex(),
-        opacity: (edge_min_opacity + (edge.weight / edge_opacity_scale))
+    if (tag_ids.indexOf(edge.source_id['$oid']) == -1 || tag_ids.indexOf(edge.sink_id['$oid']) == -1) {
+      return null
+    } else {
+      return {
+        data: {
+          id: edge._id['$oid'],
+          source: edge.source_id['$oid'],
+          target: edge.sink_id['$oid'],
+          weight: edge.weight,
+          color: scale(edge_min_color + edge.weight / edge_color_scale).hex(),
+          opacity: (edge_min_opacity + (edge.weight / edge_opacity_scale))
+        }
       }
     }
-  })
+  }).filter(function (edge) { return edge != null })
 
   cy = cytoscape({
 
-    container: $(GRAPH_SELECTOR),
+    container: $('.full-screen'),
     elements: tag_data.concat(edge_data),
     style: [
       {
         selector: 'node',
         style: {
           'background-color': 'data(color)',
-          'opacity': 0.75,
           'color': 'black',
+          'opacity': 'data(opacity)',
           'label': 'data(name)',
           'width': 'data(width)',
           'height': 'data(width)'
@@ -90,8 +89,21 @@ function drawNetwork() {
 }
 
 $(function () {
-  $(document).ajaxComplete(function () {
+
+  urlParams = new URLSearchParams(window.location.search);
+  var q = urlParams.get('q')
+
+  tags = []
+  edges = []
+
+  $.get(`${BASE_URI}/tags?q=${q}`, function (data) {
+    tags = data
+    $.each(tags, function (i, tag) {
+      edges.push(...tag['edges_as_source'])
+      edges.push(...tag['edges_as_sink'])
+    })
     drawNetwork()
     $(window).one('focus', function () { drawNetwork() })
   })
+
 })

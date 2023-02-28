@@ -18,4 +18,16 @@ class Tag
       weight: :number
     }
   end
+
+  after_create do
+    Link.or(
+      { 'data.title': /\b#{name}\b/i },
+      { 'data.description': /\b#{name}\b/i }
+    ).each do |link|
+      tagships.create(link: link)
+    end
+    Tag.all.each do |sink|
+      Edge.find_or_create(self, sink)
+    end
+  end
 end

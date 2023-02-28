@@ -24,20 +24,17 @@ class Edge
     "#{source.name} - #{sink.name}"
   end
 
-  def self.populate!
-    Edge.destroy_all
-    Tag.all.each do |source|
-      Tag.all.each do |sink|
-        find_or_create(source, sink)
-      end
-    end
-  end
-
   def self.find_or_create(source, sink)
     if !(edge = find_by(source: source, sink: sink)) && !(edge = find_by(source: sink, sink: source)) && source != sink
       puts "creating edge for #{source.name} - #{sink.name}"
       edge = create(source: source, sink: sink)
     end
     edge
+  end
+
+  after_create do
+    Link.where(:id.in => source.tagships.pluck(:link_id) & sink.tagships.pluck(:link_id)).each do |link|
+      edgeships.create(link: link)
+    end
   end
 end

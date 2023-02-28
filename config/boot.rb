@@ -16,6 +16,8 @@ Mongoid.raise_not_found_error = false
 
 Delayed::Worker.max_attempts = 1
 
+String.send(:define_method, :html_safe?) { true }
+
 DISCORD = Faraday.new(
   url: 'https://discord.com/api/v9',
   headers: { 'Content-Type': 'Application/json', Authorization: "Bot #{ENV['DISCORD_BOT_TOKEN']}" }

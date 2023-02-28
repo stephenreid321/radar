@@ -12,7 +12,10 @@ class Edgeship
     }
   end
 
-  after_save do
+  after_create :update_edge_weight
+  after_destroy :update_edge_weight
+
+  def update_edge_weight
     edge.update_attribute(:weight, edge.edgeships.count)
   end
 end

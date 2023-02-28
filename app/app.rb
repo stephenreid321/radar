@@ -40,21 +40,49 @@ module Radar
       erb :not_found, layout: :application
     end
 
+    get '/' do
+      Faraday.get('https://radar-knowledge-graph.webflow.io/').body.gsub('https://radar-knowledgegraph.herokuapp.com', ENV['BASE_URI'])
+    end
+
     get '/invite' do
       bot = Discordrb::Bot.new(token: ENV['DISCORD_BOT_TOKEN'])
       bot.invite_url(permission_bits: 1024)
     end
 
     get '/links', provides: :json do
-      Link.all.as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      Link.or(
+        { 'data.title': /\b#{params[:q]}\b/i },
+        { 'data.description': /\b#{params[:q]}\b/i }
+      ).first(10).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', provides: :json do
-      Tag.all.as_json.to_json
+      Tag.where(
+        :id.in => Tagship.where(:link_id.in => Link.or(
+          { 'data.title': /\b#{params[:q]}\b/i },
+          { 'data.description': /\b#{params[:q]}\b/i }
+        ).pluck(:id)).pluck(:tag_id)
+      ).as_json(include: [:edges_as_source, :edges_as_sink]).to_json
     end
 
-    get '/edges', provides: :json do
-      Edge.where(:weight.gt => 0).as_json.to_json
+    post '/tags', provides: :json do
+      Tag.find_or_create_by!(name: params[:name]).to_json
+    end
+
+    get '/discover' do
+      stops = STOPS
+      stops += Tag.all.pluck(:name)
+
+      text = []
+      Link.all.each do |link|
+        text << link['data']['title']
+        text << link['data']['description']
+      end
+      text = text.flatten.join(' ').downcase
+      words = text.split(' ')
+      @word_frequency = words.reject { |a| stops.include?(a) || a.length < 4 }.each_with_object(Hash.new(0)) { |word, counts| counts[word] += 1 }
+      @phrase2_frequency = words.each_cons(2).reject { |a, b| stops.include?("#{a} #{b}") || (stops.include?(a) || stops.include?(b)) || (a.length < 4 || b.length < 4) }.each_with_object(Hash.new(0)) { |word, counts| counts[word.join(' ')] += 1 }
+      erb :discover
     end
 
     get '/graph' do
