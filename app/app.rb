@@ -50,27 +50,36 @@ module Radar
     end
 
     get '/links', provides: :json do
-      links = if params[:tag] && params[:tag] != 'null'
+      links = if params[:tag]
                 Link.where(:id.in => Tagship.where(tag: Tag.find_by(name: params[:tag])).pluck(:link_id))
               else
                 Link.all
               end
-      if params[:q] && params[:q] != 'null'
-        links = links.or(
+      if params[:q]
+        links = links.where(:id.in => Link.or(
           { 'data.title': /\b#{params[:q]}\b/i },
           { 'data.description': /\b#{params[:q]}\b/i }
-        )
+        ).pluck(:id))
       end
-      links.first(10).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
+      links.first(50).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
     get '/tags', provides: :json do
-      Tag.where(
-        :id.in => Tagship.where(:link_id.in => Link.or(
-          { 'data.title': /\b#{params[:q]}\b/i },
-          { 'data.description': /\b#{params[:q]}\b/i }
-        ).pluck(:id)).pluck(:tag_id)
-      ).as_json(include: [:edges_as_source, :edges_as_sink]).to_json
+      tags = if params[:tag]
+               tag = Tag.find_by(name: params[:tag])
+               Tag.where(:id.in => [tag.id] + tag.edges_as_source.where(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.where(:weight.gt => 0).pluck(:source_id))
+             else
+               Tag.all
+             end
+      if params[:q]
+        tags = Tag.where(
+          :id.in => Tagship.where(:link_id.in => Link.or(
+            { 'data.title': /\b#{params[:q]}\b/i },
+            { 'data.description': /\b#{params[:q]}\b/i }
+          ).pluck(:id)).pluck(:tag_id)
+        )
+      end
+      tags.as_json(include: [:edges_as_source, :edges_as_sink]).to_json
     end
 
     post '/tags', provides: :json do

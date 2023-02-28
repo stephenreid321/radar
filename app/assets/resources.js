@@ -6,19 +6,22 @@ $(function () {
   $('.category-block').hide()
   $('.categories').css('height', 'auto')
 
+
+  $('.logo').click(function () { window.location.href = '/' }).css('cursor', 'pointer')
   $('.resources-block').hide()
 
   urlParams = new URLSearchParams(window.location.search);
   var q = urlParams.get('q')
   var tag = urlParams.get('tag')
 
-  var searchForm = $('<form style="height: 100%"><input name="q" type="text" style="padding-left: 0.5em; width: 100%; height: 100%" /></form>')
-  searchForm.find('input').val(q)
+  var searchForm = $('<form style="height: 100%"><input name="tag" type="hidden"><input name="q" type="text" style="padding-left: 0.5em; width: 100%; height: 100%" /></form>')
+  searchForm.find('input[name=q]').val(q)
+  searchForm.find('input[name=tag]').val(tag)
 
   searchForm.appendTo('.search-bar-div')
   $('.search-bar-div').css('padding', 0)
 
-  $.get(`${BASE_URI}/links?tag=${tag}&q=${q}`, function (data) {
+  $.get(`${BASE_URI}/links?${$.param({ tag: tag, q: q })}`, function (data) {
     $(data).each(function (i, link) {
       var resourceBlock = $('.resources-block').first().clone()
 
@@ -29,14 +32,14 @@ $(function () {
       if (link['data']['description'])
         resourceBlock.find('.resource-description').html(`<p class="description-paragraph">${link['data']['description']}`)
 
-      resourceBlock.find('.resource-header-icons .web').click(function () { window.open(link['data']['url']) })
-      resourceBlock.find('.resource-header-icons .discord').click(function () { window.open(`https://discord.com/channels/${GUILD_ID}/${link['message']['data']['channel_id']}/${link['message']['data']['id']}`) })
+      resourceBlock.find('.resource-header-icons .web').click(function () { window.open(link['data']['url']) }).css('cursor', 'pointer')
+      resourceBlock.find('.resource-header-icons .discord').click(function () { window.open(`https://discord.com/channels/${GUILD_ID}/${link['message']['data']['channel_id']}/${link['message']['data']['id']}`) }).css('cursor', 'pointer')
       resourceBlock.find('.resources-content').css('height', 'auto')
 
       resourceBlock.find('.tags').hide()
       $(link['tagships']).each(function (i, tagship) {
         var tag = resourceBlock.find('.tags').first().clone()
-        tag.click(function () { window.location.href = `/?tag=${tagship['tag']['name']}` })
+        tag.click(function () { window.location.href = `/?tag=${tagship['tag']['name']}` }).css('cursor', 'pointer')
         tag.text(tagship['tag']['name'])
         tag.appendTo(resourceBlock.find('.list-item-2')).show()
       })

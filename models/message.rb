@@ -27,11 +27,19 @@ class Message
     end
   end
 
+  def self.active_thread_count
+    c = 0
+    threads = JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads']
+    threads.each_with_index do |thread, i|
+      m = JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).count
+      puts "thread #{i + 1}/#{threads.count}: #{m} messages"
+      c += m
+    end
+  end
+
   def self.populate!
-    Message.destroy_all
     JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads'].each do |thread|
-      channel_id = thread['id']
-      JSON.parse(DISCORD.get("channels/#{channel_id}/messages").body).each do |message_data|
+      JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).each do |message_data|
         Message.create(discord_id: message_data['id'], data: message_data)
       end
     end

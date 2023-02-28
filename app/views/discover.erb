@@ -8,7 +8,8 @@
         <li>
           <a href="javascript:;" onclick="
         var a = this;
-        $.post('/tags', {name: '<%=w%>'}, function() { $(a).parent().remove(); });
+        $(a).parent().remove();
+        $.post('/tags', {name: '<%=w%>'});
         "
         class="text-contrast" title="<%= f %>" style="font-size: <%= em = f.to_f / x; em > 2 ? 2 : em %>em">  <%= w %>   </a>
           <label class="d-none badge badge-primary"><%=f%></label>
