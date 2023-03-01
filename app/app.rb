@@ -68,7 +68,7 @@ module Radar
     end
 
     get '/links', cache: true, provides: :json do
-      cache_key { "links-#{params[:channel]}-#{params[:tags].sort}-#{params[:q]}" }
+      cache_key { "links-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       links = Link.order('posted_at desc')
       if params[:tags]
         # Link.where(:id.in => Tagship.where(:tag_id.in => Tag.where(:name.in => params[:tags]).pluck(:id)).pluck(:link_id))
@@ -97,7 +97,7 @@ module Radar
     end
 
     get '/tags', cache: true, provides: :json do
-      cache_key { "tags-#{params[:channel]}-#{params[:tags].sort}-#{params[:q]}" }
+      cache_key { "tags-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       tags = if params[:tags]
                tags = Tag.where(:name.in => params[:tags])
                Tag.where(:id.in => tags.pluck(:id) + Edge.where(:weight.gt => 0).where(:source_id.in => tags.pluck(:id)).pluck(:sink_id) + Edge.where(:weight.gt => 0).where(:sink_id.in => tags.pluck(:id)).pluck(:source_id))
