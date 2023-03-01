@@ -77,7 +77,7 @@ $(function () {
           tag.css('border-color', '#A706FA')
           tag.css('background-color', chroma('#A706FA').alpha(0.1).css())
         } else {
-          var tags = urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tag_name]) : [tag_name]
+          var tags = (channel['id'] == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tag_name]) : [tag_name])
           tag.click(function () { window.location.href = `/?${$.param({ channel: channel['id'], tags: tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         }
         tag.appendTo(categoryBlock.find('.pricing-feature-list')).show()
