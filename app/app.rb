@@ -68,12 +68,20 @@ module Radar
     end
 
     get '/links', cache: true, provides: :json do
-      cache_key { "links-#{params[:channel]}-#{params[:tag]}-#{params[:q]}" }
-      links = if params[:tag]
-                Link.where(:id.in => Tagship.where(tag: Tag.find_by(name: params[:tag])).pluck(:link_id))
-              else
-                Link.order('posted_at desc')
-              end
+      cache_key { "links-#{params[:channel]}-#{params[:tags].sort}-#{params[:q]}" }
+      links = Link.order('posted_at desc')
+      if params[:tags]
+        # Link.where(:id.in => Tagship.where(:tag_id.in => Tag.where(:name.in => params[:tags]).pluck(:id)).pluck(:link_id))
+        link_ids = []
+        params[:tags].each do |tag|
+          if link_ids.empty?
+            link_ids = Tagship.where(tag: Tag.find_by(name: tag)).pluck(:link_id)
+          else
+            link_ids &= Tagship.where(tag: Tag.find_by(name: tag)).pluck(:link_id)
+          end
+        end
+        links = links.where(:id.in => link_ids)
+      end
       if params[:channel]
         links = links.where(:message_id.in => Message.where(
           channel_id: params[:channel]
@@ -89,10 +97,10 @@ module Radar
     end
 
     get '/tags', cache: true, provides: :json do
-      cache_key { "tags-#{params[:channel]}-#{params[:tag]}-#{params[:q]}" }
-      tags = if params[:tag]
-               tag = Tag.find_by(name: params[:tag])
-               Tag.where(:id.in => [tag.id] + tag.edges_as_source.where(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.where(:weight.gt => 0).pluck(:source_id))
+      cache_key { "tags-#{params[:channel]}-#{params[:tags].sort}-#{params[:q]}" }
+      tags = if params[:tags]
+               tags = Tag.where(:name.in => params[:tags])
+               Tag.where(:id.in => tags.pluck(:id) + Edge.where(:weight.gt => 0).where(:source_id.in => tags.pluck(:id)).pluck(:sink_id) + Edge.where(:weight.gt => 0).where(:sink_id.in => tags.pluck(:id)).pluck(:source_id))
              else
                Tag.all
              end

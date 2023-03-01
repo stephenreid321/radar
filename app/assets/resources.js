@@ -6,21 +6,21 @@ $(function () {
   $('.categories').css('height', 'auto')
 
   urlParams = new URLSearchParams(window.location.search);
-  var q = urlParams.get('q')
-  var tag = urlParams.get('tag')
-  var channel = urlParams.get('channel')
 
   $('.tags-divider').hide()
   $('.selected-tags-wrapper .tags').hide()
-  if (tag) {
+  // unique tags
+  tags = urlParams.getAll('tags[]')
+  tags = tags.filter(function (item, pos) { return tags.indexOf(item) == pos; })
+  $(tags).each(function (i, tag) {
     var selectedTag = $('.selected-tags-wrapper .tags').first().clone()
     selectedTag.text(tag)
-    selectedTag.click(function () { window.location.href = `/?${$.param({ q: q })}` }).css('cursor', 'pointer')
+    selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
     selectedTag.css('border-color', '#A706FA')
     selectedTag.css('background-color', chroma('#A706FA').alpha(0.1).css())
     selectedTag.appendTo('.selected-tags-wrapper').show()
     $('.tags-divider').show()
-  }
+  })
 
   $('<div class="category-blocks"></div>').insertAfter('.search-bar-div')
   $('.category-block').hide()
@@ -55,6 +55,15 @@ $(function () {
 
       if (channel['id'] == urlParams.get('channel')) {
         categoryBlock.find('.category-drop').click()
+
+        var selectedTag = $('.selected-tags-wrapper .tags').first().clone()
+        selectedTag.text(`# ${channel['name']}`)
+        selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+        selectedTag.css('border-color', '#A706FA')
+        selectedTag.css('background-color', chroma('#A706FA').alpha(0.1).css())
+        selectedTag.prependTo('.selected-tags-wrapper').show()
+        $('.tags-divider').show()
+
         // categoryBlock.find('.resources-content').show()
         // categoryBlock.find('.category-drop').css({ "transform": "rotate(135deg)" })
       }
@@ -63,12 +72,13 @@ $(function () {
       $(channel['tags']).each(function (i, tag_name) {
         var tag = categoryBlock.find('.tags').first().clone()
         tag.text(tag_name)
-        if (channel['id'] == urlParams.get('channel') && tag_name == urlParams.get('tag')) {
-          tag.click(function () { window.location.href = `/?${$.param({ q: q })}` }).css('cursor', 'pointer')
+        if (channel['id'] == urlParams.get('channel') && urlParams.getAll('tags[]').indexOf(tag_name) != -1) {
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag_name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
           tag.css('border-color', '#A706FA')
           tag.css('background-color', chroma('#A706FA').alpha(0.1).css())
         } else {
-          tag.click(function () { window.location.href = `/?${$.param({ channel: channel['id'], tag: tag_name, q: q })}` }).css('cursor', 'pointer')
+          var tags = urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tag_name]) : [tag_name]
+          tag.click(function () { window.location.href = `/?${$.param({ channel: channel['id'], tags: tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         }
         tag.appendTo(categoryBlock.find('.pricing-feature-list')).show()
       })
@@ -77,16 +87,18 @@ $(function () {
     })
   })
 
-  var searchForm = $('<form style="height: 100%"><input name="channel" type="hidden"><input name="tag" type="hidden"><input name="q" type="text" style="padding-left: 0.5em; width: 100%; height: 100%" /></form>')
-  searchForm.find('input[name=channel]').val(channel)
-  searchForm.find('input[name=tag]').val(tag)
-  searchForm.find('input[name=q]').val(q)
+  var searchForm = $('<form style="height: 100%"><input name="channel" type="hidden"><input name="q" type="text" style="padding-left: 0.5em; width: 100%; height: 100%" /></form>')
+  searchForm.find('input[name=channel]').val(urlParams.get('channel'))
+  searchForm.find('input[name=q]').val(urlParams.get('q'))
+  $.each(urlParams.getAll('tags[]'), function (i, tag) {
+    searchForm.append(`<input name="tags[]" type="hidden" value="${tag}">`)
+  })
 
   searchForm.appendTo('.search-bar-div')
   $('.search-bar-div').css('background', 'none')
   $('.search-bar-div').css('padding', 0)
 
-  $.get(`${BASE_URI}/links?${$.param({ channel: channel, tag: tag, q: q })}`, function (data) {
+  $.get(`${BASE_URI}/links?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
     $(data).each(function (i, link) {
       var resourceBlock = $('.resources-block').first().clone()
 
@@ -129,12 +141,12 @@ $(function () {
       $(link['tagships']).each(function (i, tagship) {
         var tag = resourceBlock.find('.tags').first().clone()
         tag.text(tagship['tag']['name'])
-        if (tagship['tag']['name'] == urlParams.get('tag')) {
-          tag.click(function () { window.location.href = `/?${$.param({ q: q })}` }).css('cursor', 'pointer')
+        if (urlParams.getAll('tags[]').indexOf(tagship['tag']['name']) != -1) {
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagship['tag']['name'] }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
           tag.css('border-color', '#A706FA')
           tag.css('background-color', chroma('#A706FA').alpha(0.1).css())
         } else {
-          tag.click(function () { window.location.href = `/?${$.param({ tag: tagship['tag']['name'], q: q })}` }).css('cursor', 'pointer')
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([tagship['tag']['name']]), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         }
         tag.appendTo(resourceBlock.find('.list-item-2')).show()
       })

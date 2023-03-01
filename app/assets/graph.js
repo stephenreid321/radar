@@ -19,7 +19,7 @@ function drawNetwork() {
   })
 
   tag_data = $.map(tags, function (tag, i) {
-    if (tag.name == urlParams.get('tag'))
+    if (urlParams.getAll('tags[]').indexOf(tag.name) != -1)
       color = '#A706FA'
     else
       color = scale(node_min_color + (tag.weight / node_color_scale)).hex()
@@ -105,10 +105,11 @@ function drawNetwork() {
   // });
 
   cy.on('tap', 'node', function () {
-    if (this.data('name') == urlParams.get('tag'))
-      window.location.href = `/?${$.param({ q: q })}`
+    var node = this
+    if (urlParams.getAll('tags[]').indexOf(this.data('name')) != -1)
+      window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != node.data('name') }), q: urlParams.get('q') })}`
     else
-      window.location.href = `/?${$.param({ tag: this.data('name'), q: q })}`
+      window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([node.data('name')]), q: urlParams.get('q') })}`
   });
   // cy.on('tap', 'edge', function () {
   //   window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
@@ -120,14 +121,11 @@ function drawNetwork() {
 $(function () {
 
   urlParams = new URLSearchParams(window.location.search);
-  q = urlParams.get('q')
-  tag = urlParams.get('tag')
-  channel = urlParams.get('channel')
 
   tags = []
   edges = []
 
-  $.get(`${BASE_URI}/tags?${$.param({ channel: channel, tag: tag, q: q })}`, function (data) {
+  $.get(`${BASE_URI}/tags?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
     tags = data
     $.each(tags, function (i, tag) {
       edges.push(...tag['edges_as_source'])
