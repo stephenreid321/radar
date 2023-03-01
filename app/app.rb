@@ -51,8 +51,7 @@ module Radar
 
     get '/channels', cache: true, provides: :json do
       cache_key { 'channels' }
-      Message.distinct(:channel_id).map do |channel_id|
-        channel_name = Message.where(channel_id: channel_id).first.channel_name
+      Message.pluck(:channel_id, :channel_name).uniq.map do |channel_id, channel_name|
         {
           name: channel_name,
           id: channel_id,
