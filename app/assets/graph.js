@@ -10,9 +10,9 @@ function drawNetwork() {
   node_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight; }))
 
   edge_min_color = 1
-  edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight; }))
-  edge_min_opacity = 0.15
-  edge_opacity_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight; }))
+  edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
+  edge_min_opacity = 0.1
+  edge_opacity_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
 
   tag_ids = $.map(tags, function (tag, i) {
     return tag._id['$oid']
@@ -40,7 +40,7 @@ function drawNetwork() {
   })
 
   edge_data = $.map(edges, function (edge, i) {
-    if (tag_ids.indexOf(edge.source_id['$oid']) == -1 || tag_ids.indexOf(edge.sink_id['$oid']) == -1) {
+    if (edge.weight == 0 || tag_ids.indexOf(edge.source_id['$oid']) == -1 || tag_ids.indexOf(edge.sink_id['$oid']) == -1) {
       return null
     } else {
 
@@ -53,12 +53,12 @@ function drawNetwork() {
           source: edge.source_id['$oid'],
           target: edge.sink_id['$oid'],
           weight: edge.weight,
-          color: scale(edge_min_color + edge.weight / edge_color_scale).hex(),
+          color: scale(edge_min_color + (edge.weight / edge_color_scale)).hex(),
           opacity: opacity
         }
       }
     }
-  }).filter(function (edge) { return edge != null })
+  })
 
   cy = cytoscape({
 
@@ -129,7 +129,6 @@ $(function () {
     tags = data
     $.each(tags, function (i, tag) {
       edges.push(...tag['edges_as_source'])
-      edges.push(...tag['edges_as_sink'])
     })
     drawNetwork()
     $(window).one('focus', function () { drawNetwork() })
