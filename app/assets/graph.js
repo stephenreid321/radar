@@ -5,9 +5,9 @@ function drawNetwork() {
   node_min_width = 10
   node_width_multiplier = 10
   node_min_color = 0.25
-  node_color_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight; }))
+  node_color_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
   node_min_opacity = 1
-  node_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight; }))
+  node_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
 
   edge_min_color = 1
   edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
