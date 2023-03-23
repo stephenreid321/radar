@@ -60,6 +60,7 @@ function drawNetwork() {
     }
   })
 
+  $('.full-screen').css('opacity', 0)
   cy = cytoscape({
 
     container: $('.full-screen'),
@@ -90,6 +91,7 @@ function drawNetwork() {
     }
 
   });
+  $('.full-screen').animate({ opacity: 1 })
 
   cy.on('mouseover', 'node', function (e) {
     $('.full-screen').css('cursor', 'pointer');
@@ -106,10 +108,18 @@ function drawNetwork() {
 
   cy.on('tap', 'node', function () {
     var node = this
-    if (urlParams.getAll('tags[]').indexOf(this.data('name')) != -1)
-      window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != node.data('name') }), q: urlParams.get('q') })}`
-    else
-      window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([node.data('name')]), q: urlParams.get('q') })}`
+    if (urlParams.getAll('tags[]').indexOf(this.data('name')) != -1) {
+      // fade out
+      $('.full-screen').fadeOut(function () {
+        window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != node.data('name') }), q: urlParams.get('q') })}`
+      })
+    }
+    else {
+      // fade out
+      $('.full-screen').fadeOut(function () {
+        window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([node.data('name')]), q: urlParams.get('q') })}`
+      })
+    }
   });
   // cy.on('tap', 'edge', function () {
   //   window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
