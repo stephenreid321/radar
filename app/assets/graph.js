@@ -60,10 +60,10 @@ function drawNetwork() {
     }
   })
 
-  $('.full-screen').css('opacity', 0)
+  $('#graph').css('opacity', 0)
   cy = cytoscape({
 
-    container: $('.full-screen'),
+    container: $('#graph'),
     elements: tag_data.concat(edge_data),
     style: [
       {
@@ -91,24 +91,24 @@ function drawNetwork() {
     }
 
   });
-  $('.full-screen').animate({ opacity: 1 })
+  $('#graph').animate({ opacity: 1 })
 
   cy.on('mouseover', 'node', function (e) {
-    $('.full-screen').css('cursor', 'pointer');
+    $('#graph').css('cursor', 'pointer');
   });
   cy.on('mouseout', 'node', function (e) {
-    $('.full-screen').css('cursor', 'default');
+    $('#graph').css('cursor', 'default');
   });
   // cy.on('mouseover', 'edge', function (e) {
-  //   $('.full-screen').css('cursor', 'pointer');
+  //   $('#graph').css('cursor', 'pointer');
   // });
   // cy.on('mouseout', 'edge', function (e) {
-  //   $('.full-screen').css('cursor', 'default');
+  //   $('#graph').css('cursor', 'default');
   // });
 
   cy.on('tap', 'node', function () {
     var node = this
-    $('.full-screen').fadeOut(function () {
+    $('#graph').fadeOut(function () {
       if (urlParams.getAll('tags[]').indexOf(node.data('name')) != -1)
         window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != node.data('name') }), q: urlParams.get('q') })}`
       else
@@ -128,6 +128,8 @@ $(function () {
 
   tags = []
   edges = []
+
+  $('<div style="width: 100%; height: 100%" id="graph"></div>').appendTo('.full-screen')
 
   $.get(`${BASE_URI}/tags?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
     tags = data
