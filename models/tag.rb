@@ -15,7 +15,10 @@ class Tag
   def self.admin_fields
     {
       name: :text,
-      weight: :number
+      weight: :number,
+      tagships: :collection,
+      edges_as_source: :collection,
+      edges_as_sink: :collection
     }
   end
 
@@ -24,10 +27,7 @@ class Tag
   end
 
   def links
-    Link.or(
-      { 'data.title': /\b#{name}\b/i },
-      { 'data.description': /\b#{name}\b/i }
-    )
+    Link.where(:tags.in => [name])
   end
 
   after_create :create_tagships

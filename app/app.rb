@@ -89,7 +89,8 @@ module Radar
       if params[:q]
         links = links.where(:id.in => Link.or(
           { 'data.title': /\b#{params[:q]}\b/i },
-          { 'data.description': /\b#{params[:q]}\b/i }
+          { 'data.description': /\b#{params[:q]}\b/i },
+          { :tags_downcase.in => [params[:q].downcase] }
         ).pluck(:id))
       end
       links.limit(50).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
@@ -116,7 +117,8 @@ module Radar
         tags = tags.where(
           :id.in => Tagship.where(:link_id.in => Link.or(
             { 'data.title': /\b#{params[:q]}\b/i },
-            { 'data.description': /\b#{params[:q]}\b/i }
+            { 'data.description': /\b#{params[:q]}\b/i },
+            { :tags_downcase.in => [params[:q].downcase] }
           ).pluck(:id)).pluck(:tag_id)
         )
       end
