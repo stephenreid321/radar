@@ -108,18 +108,12 @@ function drawNetwork() {
 
   cy.on('tap', 'node', function () {
     var node = this
-    if (urlParams.getAll('tags[]').indexOf(this.data('name')) != -1) {
-      // fade out
-      $('.full-screen').fadeOut(function () {
+    $('.full-screen').fadeOut(function () {
+      if (urlParams.getAll('tags[]').indexOf(this.data('name')) != -1)
         window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != node.data('name') }), q: urlParams.get('q') })}`
-      })
-    }
-    else {
-      // fade out
-      $('.full-screen').fadeOut(function () {
+      else
         window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([node.data('name')]), q: urlParams.get('q') })}`
-      })
-    }
+    })
   });
   // cy.on('tap', 'edge', function () {
   //   window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
