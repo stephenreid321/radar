@@ -94,7 +94,7 @@ function drawNetwork() {
     }
   })
 
-  if (urlParams.get('channel') != null) {
+  if (urlParams.get('channel')) {
     var channel = urlParams.get('channel')
     $.each(tags, function (i, tag) {
       edge_data.push({
