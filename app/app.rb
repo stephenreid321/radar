@@ -100,8 +100,16 @@ module Radar
     get '/tags', cache: true, provides: :json do
       cache_key { "tags-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       tags = if params[:tags]
-               tags = Tag.where(:name.in => params[:tags])
-               Tag.where(:id.in => tags.pluck(:id) + Edge.where(:weight.gt => 0).where(:source_id.in => tags.pluck(:id)).pluck(:sink_id) + Edge.where(:weight.gt => 0).where(:sink_id.in => tags.pluck(:id)).pluck(:source_id))
+               tag_ids = []
+               Tag.where(:name.in => params[:tags]).each do |tag|
+                 tag_ids_ = [tag.id] + tag.edges_as_source.where(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.where(:weight.gt => 0).pluck(:source_id)
+                 if tag_ids.empty?
+                   tag_ids = tag_ids_
+                 else
+                   tag_ids &= tag_ids_
+                 end
+               end
+               Tag.where(:id.in => tag_ids)
              else
                Tag.all
              end
