@@ -2,17 +2,50 @@ function drawNetwork() {
 
   scale = chroma.scale(['#fff', '#999']);
 
-  node_min_width = 10
-  node_width_multiplier = 10
-  node_min_color = 0.25
-  node_color_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
-  node_min_opacity = 1
-  node_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
+  channel_min_width = 10
+  channel_width_multiplier = 10
+  channel_min_color = 0.25
+  channel_color_scale = Math.max.apply(null, $(channels).map(function (i, channel) { return channel.weight }))
+  channel_min_opacity = 1
+  channel_opacity_scale = Math.max.apply(null, $(channels).map(function (i, channel) { return channel.weight }))
+
+  tag_min_width = 10
+  tag_width_multiplier = 10
+  tag_min_color = 0.25
+  tag_color_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
+  tag_min_opacity = 1
+  tag_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
 
   edge_min_color = 1
   edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
   edge_min_opacity = 0.1
   edge_opacity_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
+
+  channel_data = $.map(channels, function (channel, i) {
+    if (urlParams.get('channel') == channel.id)
+      color = '#FAC706'
+    else
+      color = scale(channel_min_color + (channel.weight / channel_color_scale)).hex()
+
+    opacity = channel_min_opacity + (channel.weight / channel_opacity_scale)
+    if (opacity > 1) opacity = 1
+
+    if (urlParams.get('channel') != channel.id) {
+      return null
+    } else {
+      return {
+        data: {
+          type: 'channel',
+          id: channel.id,
+          name: channel.name,
+          weight: channel.weight,
+          width: (channel_min_width + ((channel_min_width * channel_width_multiplier) * channel.weight / channel_color_scale)),
+          color: color,
+          opacity: opacity
+        }
+      }
+    }
+  })
 
   tag_ids = $.map(tags, function (tag, i) {
     return tag._id['$oid']
@@ -22,17 +55,18 @@ function drawNetwork() {
     if (urlParams.getAll('tags[]').indexOf(tag.name) != -1)
       color = '#A706FA'
     else
-      color = scale(node_min_color + (tag.weight / node_color_scale)).hex()
+      color = scale(tag_min_color + (tag.weight / tag_color_scale)).hex()
 
-    opacity = node_min_opacity + (tag.weight / node_opacity_scale)
+    opacity = tag_min_opacity + (tag.weight / tag_opacity_scale)
     if (opacity > 1) opacity = 1
 
     return {
       data: {
+        type: 'tag',
         id: tag._id['$oid'],
         name: tag.name,
         weight: tag.weight,
-        width: (node_min_width + ((node_min_width * node_width_multiplier) * tag.weight / node_color_scale)),
+        width: (tag_min_width + ((tag_min_width * tag_width_multiplier) * tag.weight / tag_color_scale)),
         color: color,
         opacity: opacity
       }
@@ -60,11 +94,27 @@ function drawNetwork() {
     }
   })
 
+  if (urlParams.get('channel') != null) {
+    var channel = urlParams.get('channel')
+    $.each(tags, function (i, tag) {
+      edge_data.push({
+        data: {
+          id: `${tag._id['$oid']}-${channel.id}`,
+          source: tag._id['$oid'],
+          target: channel,
+          weight: 1,
+          color: '#999',
+          opacity: 0.5
+        }
+      })
+    })
+  }
+
   $('#graph').css('opacity', 0)
   cy = cytoscape({
 
     container: $('#graph'),
-    elements: tag_data.concat(edge_data),
+    elements: channel_data.concat(tag_data).concat(edge_data),
     style: [
       {
         selector: 'node',
@@ -106,13 +156,22 @@ function drawNetwork() {
   //   $('#graph').css('cursor', 'default');
   // });
 
-  cy.on('tap', 'node', function () {
+  cy.on('tap', 'node', function (x, y) {
     var node = this
     $('#graph').fadeOut(function () {
-      if (urlParams.getAll('tags[]').indexOf(node.data('name')) != -1)
-        window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != node.data('name') }), q: urlParams.get('q') })}`
-      else
-        window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([node.data('name')]), q: urlParams.get('q') })}`
+      if (node.data('type') == 'channel') {
+        var channel_node = node
+        if (urlParams.get('channel') == channel_node.data('id'))
+          window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
+        else
+          window.location.href = `/?${$.param({ channel: channel_node.data('id'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
+      } else if (node.data('type') == 'tag') {
+        var tag_node = node
+        if (urlParams.getAll('tags[]').indexOf(tag_node.data('name')) != -1)
+          window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag_node.data('name') }), q: urlParams.get('q') })}`
+        else
+          window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([tag_node.data('name')]), q: urlParams.get('q') })}`
+      }
     })
   });
   // cy.on('tap', 'edge', function () {
@@ -126,16 +185,22 @@ $(function () {
 
   urlParams = new URLSearchParams(window.location.search);
 
+  channels = []
   tags = []
   edges = []
 
   $('<div style="width: 100%; height: 100%" id="graph"></div>').appendTo('.full-screen')
 
-  $.get(`${BASE_URI}/tags?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
-    tags = data
-    $.each(tags, function (i, tag) {
-      edges.push(...tag['edges_as_source'])
+  $.get(`${BASE_URI}/channels`, function (data) {
+    channels = data
+  }).then(function () {
+    return $.get(`${BASE_URI}/tags?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
+      tags = data
+      $.each(tags, function (i, tag) {
+        edges.push(...tag['edges_as_source'])
+      })
     })
+  }).then(function () {
     drawNetwork()
     $(window).one('focus', function () { drawNetwork() })
   })

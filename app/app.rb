@@ -55,6 +55,7 @@ module Radar
         {
           name: channel_name,
           id: channel_id,
+          weight: 1,
           tags: Tag.where(:id.in =>
             Tagship.where(:link_id.in =>
               Link.where(:message_id.in =>
