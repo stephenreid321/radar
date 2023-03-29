@@ -53,6 +53,12 @@ class Message
     c
   end
 
+  def self.reset!
+    [Message, Link, Tagship, Edgeship].each { |m| m.delete_all }
+    Tag.all.set(weight: 0)
+    Edge.all.set(weight: 0)
+  end
+
   def self.populate(n = nil)
     threads = JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads']
     threads = threads[0..n - 1] if n
