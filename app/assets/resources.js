@@ -72,7 +72,7 @@ $(function () {
       $(channel['tags']).each(function (i, tag_name) {
         var tag = categoryBlock.find('.tags').first().clone()
         tag.text(tag_name)
-        if (channel['id'] == urlParams.get('channel') && urlParams.getAll('tags[]').indexOf(tag_name) != -1) {
+        if (channel['id'] == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tag_name)) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag_name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
           tag.css('border-color', '#A706FA')
           tag.css('background-color', chroma('#A706FA').alpha(0.1).css())
@@ -141,7 +141,7 @@ $(function () {
       $(link['tagships']).each(function (i, tagship) {
         var tag = resourceBlock.find('.tags').first().clone()
         tag.text(tagship['tag']['name'])
-        if (urlParams.getAll('tags[]').indexOf(tagship['tag']['name']) != -1) {
+        if (urlParams.getAll('tags[]').includes(tagship['tag']['name'])) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagship['tag']['name'] }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
           tag.css('border-color', '#A706FA')
           tag.css('background-color', chroma('#A706FA').alpha(0.1).css())

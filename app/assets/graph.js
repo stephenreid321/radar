@@ -52,7 +52,7 @@ function drawNetwork() {
   })
 
   tag_data = $.map(tags, function (tag, i) {
-    if (urlParams.getAll('tags[]').indexOf(tag.name) != -1)
+    if (urlParams.getAll('tags[]').includes(tag.name))
       color = '#A706FA'
     else
       color = scale(tag_min_color + (tag.weight / tag_color_scale)).hex()
@@ -74,7 +74,7 @@ function drawNetwork() {
   })
 
   edge_data = $.map(edges, function (edge, i) {
-    if (edge.weight == 0 || tag_ids.indexOf(edge.source_id['$oid']) == -1 || tag_ids.indexOf(edge.sink_id['$oid']) == -1) {
+    if (edge.weight == 0 || !tag_ids.includes(edge.source_id['$oid']) || !tag_ids.includes(edge.sink_id['$oid'])) {
       return null
     } else {
 
@@ -167,7 +167,7 @@ function drawNetwork() {
           window.location.href = `/?${$.param({ channel: channel_node.data('id'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
       } else if (node.data('type') == 'tag') {
         var tag_node = node
-        if (urlParams.getAll('tags[]').indexOf(tag_node.data('name')) != -1)
+        if (urlParams.getAll('tags[]').includes(tag_node.data('name')))
           window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag_node.data('name') }), q: urlParams.get('q') })}`
         else
           window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([tag_node.data('name')]), q: urlParams.get('q') })}`
