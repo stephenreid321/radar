@@ -71,10 +71,12 @@ class Link
     return unless title && description
 
     n = 1
-    openapi_response = OPENAI.post('chat/completions') do |req|
+    openai_response = OPENAI.post('chat/completions') do |req|
       req.body = { model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: prompt }] }.to_json
     end
-    tags = JSON.parse(openapi_response.body)['choices'][0]['message']['content'].split(', ')
+    raise Faraday::TimeoutError if JSON.parse(openai_response.body)['error']
+
+    tags = JSON.parse(openai_response.body)['choices'][0]['message']['content'].split(', ')
     tags = tags.select { |t| Tag.pluck(:name).include?(t) }
     if tags.count > 0
       update_attribute(:tags, tags)
