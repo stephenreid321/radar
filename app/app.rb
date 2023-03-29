@@ -109,7 +109,7 @@ module Radar
                    tag_ids &= tag_ids_
                  end
                end
-               Tag.where(:id.in => tag_ids)
+               Tag.where(:id.in => Tag.where(:name.in => params[:tags]).pluck(:id) + tag_ids)
              else
                Tag.all
              end
