@@ -9,7 +9,8 @@ $(function () {
   $('.tags-divider').hide()
   $('.selected-tags-wrapper .tags').hide()
   // unique tags
-  const tags = urlParams.getAll('tags[]').filter(function (item, pos) { return tags.indexOf(item) == pos })
+  let tags = urlParams.getAll('tags[]')
+  tags = tags.filter(function (item, pos) { return tags.indexOf(item) == pos })
   $(tags).each(function (i, tag) {
     const selectedTag = $('.selected-tags-wrapper .tags').first().clone()
     selectedTag.text(tag)
