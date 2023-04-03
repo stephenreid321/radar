@@ -12,6 +12,7 @@ class Link
   field :posted_at, type: Time
   field :tags, type: Array
   field :tags_downcase, type: Array
+  field :tagged_at, type: Time
 
   index({ url: 1 })
   index({ posted_at: 1 })
@@ -52,37 +53,52 @@ class Link
 
   def prompt
     %(
-      ---
-      Title: #{title.to_json}
+      # Terms
+      #{Tag.pluck(:name).join("\n")}
+
+      # Link
+      Title: #{title}
       URL: #{url}
-      Description: #{description.to_json}
+      Description: #{description}
+
       ---
-
-      Select the terms most relevant to the link above from the following list. Make sure to only select terms that appear in the list below. Choose up to 5 terms.
-
-      #{Tag.pluck(:name).join(', ')}
-
+      Select up to 5 terms from the list of terms that are most relevant to the link.
+      IMPORTANT: Only select terms that are present in the list of terms.
       Return the result as a comma-separated list.
     )
   end
 
-  def set_tags!(attempt: 1)
-    return if tags && !tags.empty?
-    return unless title && description
+  def self.taggable
+    where(:title.ne => nil, :description.ne => nil)
+  end
 
+  def set_tags!(attempt: 1, force: false)
+    unless force
+      return if tags && !tags.empty?
+      return unless title && description
+    end
+
+    puts "tagging #{url} (attempt #{attempt})"
     n = 1
     openai_response = OPENAI.post('chat/completions') do |req|
       req.body = { model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: prompt }] }.to_json
     end
     raise Faraday::TimeoutError if JSON.parse(openai_response.body)['error']
 
-    tags = JSON.parse(openai_response.body)['choices'][0]['message']['content'].split(', ')
+    update_attribute(:tagged_at, Time.now)
+
+    content = JSON.parse(openai_response.body)['choices'][0]['message']['content']
+    content = content[0..-2] if content[-1] == '.'
+    puts "1. #{content}"
+    tags = content.split(', ').map(&:strip)
     tags = tags.select { |t| Tag.pluck(:name).include?(t) }
+    puts "2. #{tags.join(', ')}"
     if tags.count > 0
       update_attribute(:tags, tags)
       update_attribute(:tags_downcase, tags.map(&:downcase))
     end
   rescue Faraday::TimeoutError
-    set_tags!(attempt: attempt + 1) if attempt < 3
+    sleep 1
+    set_tags!(attempt: attempt + 1, force: force) if attempt < 3
   end
 end
