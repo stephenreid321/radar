@@ -101,7 +101,7 @@ $(function () {
     $(data).each(function (i, link) {
       const resourceBlock = $('.resources-block').first().clone()
 
-      resourceBlock.find('.resource-title').text('').html(truncate(link.data.title, 100, true) || truncate(link.data.description, 100, true) || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''))
+      resourceBlock.find('.resource-title').text('').html(truncate(link.data.title, 100, true) || truncate(link.data.description, 100, true) || truncate(link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''), 100))
 
       resourceBlock.find('.platform').text('').text(link.data.provider?.name || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]).click(function () { window.open(link.data.url) }).css('cursor', 'pointer')
       resourceBlock.find('.curator-name').text('').text(link.message.data.author.username).css('cursor', 'default')
