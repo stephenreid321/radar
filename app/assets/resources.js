@@ -2,7 +2,7 @@ $(function () {
   $('.logo').click(function () { window.location.href = '/' }).css('cursor', 'pointer')
   $('.header').css('width', 'auto')
   $('.resources-block').hide()
-  $('.categories').css('height', 'auto')
+  $('.categories').css('height', 'auto').css('max-height', 'calc(100% - 10%)')
 
   const urlParams = new URLSearchParams(window.location.search)
 
@@ -101,7 +101,7 @@ $(function () {
     $(data).each(function (i, link) {
       const resourceBlock = $('.resources-block').first().clone()
 
-      resourceBlock.find('.resource-title').text('').html(link.data.title || truncate(link.data.description, 100, true) || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''))
+      resourceBlock.find('.resource-title').text('').html(truncate(link.data.title, 100, true) || truncate(link.data.description, 100, true) || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''))
 
       resourceBlock.find('.platform').text('').text(link.data.provider?.name || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]).click(function () { window.open(link.data.url) }).css('cursor', 'pointer')
       resourceBlock.find('.curator-name').text('').text(link.message.data.author.username).css('cursor', 'default')

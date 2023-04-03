@@ -110,7 +110,7 @@ function drawNetwork () {
       data: {
         type: 'link',
         id: link._id.$oid,
-        name: link.data.title || truncate(link.data.description, 100, true) || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''),
+        name: truncate(link.data.title, 100, true) || truncate(link.data.description, 100, true) || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''),
         url: link.data.url,
         weight: link.weight,
         width: (link_min_width + ((link_min_width * link_width_multiplier) * link.weight / link_color_scale)),
