@@ -49,6 +49,12 @@ module Radar
       bot.invite_url(permission_bits: 1024)
     end
 
+    get '/populate' do
+      halt unless params[:key] == ENV['POPULATE_KEY']
+      Message.populate
+      redirect '/'
+    end
+
     get '/channels', cache: true, provides: :json do
       cache_key { 'channels' }
       Message.pluck(:channel_id, :channel_name).uniq.map do |channel_id, channel_name|
@@ -132,31 +138,6 @@ module Radar
         )
       end
       tags.as_json(include: [:edges_as_source, :edges_as_sink]).to_json
-    end
-
-    post '/tags', provides: :json do
-      Tag.find_or_create_by!(name: params[:name]).to_json
-      Radar::App.cache.clear
-    end
-
-    get '/discover' do
-      stops = STOPS
-      stops += Tag.all.pluck(:name)
-
-      text = []
-      Link.all.each do |link|
-        text << link['data']['title']
-        text << link['data']['description']
-      end
-      text = text.flatten.join(' ').downcase
-      words = text.split(' ')
-      @word_frequency = words.reject { |a| stops.include?(a) || a.length < 4 }.each_with_object(Hash.new(0)) { |word, counts| counts[word] += 1 }
-      @phrase2_frequency = words.each_cons(2).reject { |a, b| stops.include?("#{a} #{b}") || (a.length < 4 || b.length < 4) }.each_with_object(Hash.new(0)) { |word, counts| counts[word.join(' ')] += 1 }
-      erb :discover
-    end
-
-    get '/graph' do
-      erb :graph
     end
   end
 end

@@ -59,32 +59,35 @@ class Message
     Edge.all.set(weight: 0)
   end
 
-  def self.populate(n = nil)
-    threads = JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads']
-    threads = threads[0..n - 1] if n
-    tc = threads.count
-    threads.each_with_index do |thread, i|
-      puts "thread #{i + 1}/#{tc}"
-      channel = thread
-      channel = JSON.parse(DISCORD.get("channels/#{thread['parent_id']}").body) while [10, 11, 12].include?(channel['type'])
-      channel_id = thread['parent_id']
-      channel_name = channel['name']
+  class << self
+    def populate(n = nil)
+      threads = JSON.parse(DISCORD.get("guilds/#{ENV['GUILD_ID']}/threads/active").body)['threads']
+      threads = threads[0..n - 1] if n
+      tc = threads.count
+      threads.each_with_index do |thread, i|
+        puts "thread #{i + 1}/#{tc}"
+        channel = thread
+        channel = JSON.parse(DISCORD.get("channels/#{thread['parent_id']}").body) while [10, 11, 12].include?(channel['type'])
+        channel_id = thread['parent_id']
+        channel_name = channel['name']
 
-      JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).each do |message_data|
-        Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data)
+        JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).each do |message_data|
+          Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data)
+        end
+      end
+      tags = Tag.all
+      c = tags.count
+      tags.each_with_index do |tag, i|
+        puts "tag #{i + 1}/#{c}: #{tag.name}"
+        tag.create_tagships
+      end
+      edges = Edge.all
+      c = edges.count
+      edges.each_with_index do |edge, i|
+        puts "edge #{i + 1}/#{c}: #{edge.summary}"
+        edge.create_edgeships
       end
     end
-    tags = Tag.all
-    c = tags.count
-    tags.each_with_index do |tag, i|
-      puts "tag #{i + 1}/#{c}: #{tag.name}"
-      tag.create_tagships
-    end
-    edges = Edge.all
-    c = edges.count
-    edges.each_with_index do |edge, i|
-      puts "edge #{i + 1}/#{c}: #{edge.summary}"
-      edge.create_edgeships
-    end
+    handle_asynchronously :populate
   end
 end
