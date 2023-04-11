@@ -3,12 +3,14 @@ $(function () {
   $('.minting-block').hide()
   $('.submit-tab').hide()
   $('.profile-tab').hide()
-  $('.orientation-map').hide()
   $('.orientation-reset').hide()
 
   $('.link-resources-block').css({ height: '50%', width: '100%' })
   $('.map-right-wrapper').css('width', '100%')
   const urlParams = new URLSearchParams(window.location.search)
+
+  /* orientation map */
+  $('.orientation-map').html('<div class="all-orientation">ALL</div>')
 
   /* search */
   $('.w-form').hide()
@@ -31,6 +33,9 @@ $(function () {
     selectedTag.css('color', '#ffffff')
     selectedTag.css('background-color', '#1d1d1d')
     selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
+
+    if (i == 0) { $('<div class="arrow">></div>').appendTo('.orientation-map') } else { $('<div class="arrow">&</div>').appendTo('.orientation-map') }
+    $(`<div class="tag-orientation">${tag}</div>`).appendTo('.orientation-map')
   })
   $.get(`${BASE_URI}/tags/count`, function (data) {
     $('.tags-showing-div .small-copy.right-align').text(`${tags.length}/${data.count} tags`)
@@ -113,6 +118,8 @@ $(function () {
 
       if (channel.id == urlParams.get('channel')) {
         channelBlock.find('.plus-icon').click()
+        $(`<div class="channel-orientation">${channel.name}</div>`).insertAfter('.orientation-map .all-orientation')
+        $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
       }
 
       channelBlock.find('.tags-button-container .tag-div-button').hide()
