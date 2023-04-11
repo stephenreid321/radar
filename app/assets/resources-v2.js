@@ -148,7 +148,7 @@ $(function () {
         selectedTag.text(`${channel.name} ×`)
         selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         selectedTag.css('color', '#ffffff')
-        selectedTag.css('background-color', '#1d1d1d')
+        selectedTag.css('background-color', '#FAC707')
         selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
 
         $(`<div class="channel-orientation">${channel.name}</div>`).insertAfter('.orientation-map .all-orientation')
