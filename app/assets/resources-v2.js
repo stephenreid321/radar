@@ -3,14 +3,15 @@ $(function () {
   $('.minting-block').hide()
   $('.submit-tab').hide()
   $('.profile-tab').hide()
-  $('.orientation-reset').hide()
 
   $('.link-resources-block').css({ height: '50%', width: '100%' })
   $('.map-right-wrapper').css('width', '100%')
   const urlParams = new URLSearchParams(window.location.search)
 
-  /* orientation map */
+  /* orientation */
   $('.orientation-map').html('<div class="all-orientation">ALL</div>')
+  $('.orientation-reset .orientation-reset').css('cursor', 'pointer').click(function () { window.location.href = '/' })
+  $('.orientation-reset .orientation-random').css('cursor', 'pointer').click(function () { window.location.href = '/random' })
 
   /* search */
   $('.w-form').hide()

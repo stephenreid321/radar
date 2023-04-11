@@ -48,6 +48,10 @@ module Radar
       Faraday.get(ENV['WEBFLOW_V1_URL']).body.gsub(ENV['DO_URL'], ENV['BASE_URI'])
     end
 
+    get '/random' do
+      redirect "/?tags[]=#{Tag.collection.aggregate([{ '$sample': { size: 1 } }]).first['name']}"
+    end
+
     get '/invite' do
       bot = Discordrb::Bot.new(token: ENV['DISCORD_BOT_TOKEN'])
       bot.invite_url(permission_bits: 1024)
@@ -108,7 +112,7 @@ module Radar
     end
 
     get '/tags/count', cache: true, provides: :json do
-      {count: Tag.count}.to_json
+      { count: Tag.count }.to_json
     end
 
     get '/tags', cache: true, provides: :json do
