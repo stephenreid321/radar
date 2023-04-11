@@ -1,33 +1,33 @@
 $(function () {
-  $('.link-resources-block').css('height', '50%')
-  $('.resource-block').hide()
+  // TODO
+  $('.minting-block').hide()
+  $('.submit-tab').hide()
+  $('.profile-tab').hide()
+  $('.tags-showing-div .small-copy.right-align').hide()
+  $('.w-form').hide()
+  $('.orientation-map').hide()
+  $('.orientation-reset').hide()
+
+  $('.link-resources-block').css({ height: '50%', width: '100%' })
+  $('.map-right-wrapper').css('width', '100%')
   const urlParams = new URLSearchParams(window.location.search)
 
-  /*
-  <div class="resource-block">
-    <div class="resource-icon-div">
-      <div class="url-icon"></div>
-      <div class="discord-icon"></div>
-    </div>
-    <p class="resource-tldr">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
-      elementum tristique...</p>
-    <div class="resource-source">Source</div>
-    <div class="resource-curator">@Curator </div>
-    <div data-w-id="c4effaef-c93e-f3f0-c495-ecb3cacf62c6" class="resource-expand">
-      <div class="open-arrow"><img
-          src="https://uploads-ssl.webflow.com/6429251470b4df48f448b756/642bb5658014256aeb99fec4_arrow_open.png" alt=""
-          class="plus-icon"></div>
-      <div style="height: 0px; opacity: 0;" class="content-expander">
-        <div class="resource-expanded-content">
-          <p class="small-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
-            elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero
-            vitae erat. Aenean faucibus nibh et justo cursus id rutrum lorem imperdiet. Nunc ut sem vitae risus tristique
-            posuere.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  */
+  /* selected tags */
+  $('.tags-showing-div .showing-tags').hide()
+  // unique tags
+  let tags = urlParams.getAll('tags[]')
+  tags = tags.filter(function (item, pos) { return tags.indexOf(item) == pos })
+  $(tags).each(function (i, tag) {
+    const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
+    selectedTag.text(tag)
+    selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+    selectedTag.css('color', '#ffffff')
+    selectedTag.css('background-color', '#1d1d1d')
+    selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
+  })
+
+  /* resources */
+  $('.resource-block').hide()
   $.get(`${BASE_URI}/links?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
     $(data).each(function (i, link) {
       const resourceBlock = $('.resource-block').first().clone()
@@ -67,6 +67,59 @@ $(function () {
       resourceBlock.find('.resource-title').click(function () { resourceBlock.find('.resource-drop').click() }).css('cursor', 'pointer')
 
       resourceBlock.appendTo($('.link-resources-block').first()).show()
+    })
+  })
+
+  /* channels */
+  $('.channel-tag-wrapper').hide()
+  $.get(`${BASE_URI}/channels`, function (data) {
+    $(data).each(function (i, channel) {
+      const channelBlock = $('.channel-tag-wrapper').first().clone()
+      channelBlock.find('.channel-title a.channel-title').text(channel.name)
+
+      channelBlock.find('.tags-button-container').css('height', 'auto').hide()
+      channelBlock.find('.plus-icon').click(function () {
+        if (!channelBlock.find('.tags-button-container').is(':visible')) {
+          channelBlock.find('.tags-button-container').slideDown()
+          channelBlock.find('.plus-icon').animate({ rotation: 135 },
+            {
+              duration: 500,
+              step: function (now) {
+                channelBlock.find('.plus-icon').css({ transform: 'rotate(' + now + 'deg)' })
+              }
+            })
+        } else {
+          channelBlock.find('.tags-button-container').slideUp()
+          channelBlock.find('.plus-icon').animate({ rotation: 0 },
+            {
+              duration: 500,
+              step: function (now) {
+                channelBlock.find('.plus-icon').css({ transform: 'rotate(' + now + 'deg)' })
+              }
+            })
+        }
+      }).css('cursor', 'pointer')
+      channelBlock.find('.channel-title a.channel-title').click(function () { channelBlock.find('.plus-icon').click() }).css('cursor', 'pointer')
+
+      if (channel.id == urlParams.get('channel')) {
+        channelBlock.find('.plus-icon').click()
+      }
+
+      channelBlock.find('.tags-button-container .tag-div-button').hide()
+      $(channel.tags).each(function (i, tagName) {
+        const tag = channelBlock.find('.tags-button-container .tag-div-button').first().clone()
+        tag.text(tagName)
+        if (channel.id == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tagName)) {
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagName }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+          tag.addClass('selected')
+        } else {
+          const tags = (channel.id == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tagName]) : [tagName])
+          tag.click(function () { window.location.href = `/?${$.param({ channel: channel.id, tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+        }
+        tag.appendTo(channelBlock.find('.tags-button-container')).show()
+      })
+
+      channelBlock.appendTo('.channel-containter-scroll').show()
     })
   })
 })
