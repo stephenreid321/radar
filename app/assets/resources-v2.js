@@ -2,6 +2,7 @@ $(function () {
   /* TODO */
   $('.submit-tab').hide()
   $('.profile-tab').hide()
+  // sign in with Discord + profile page
   // tags in resource blocks?
 
   $('.link-resources-block').css({ height: '50%', width: '100%' })
@@ -126,6 +127,14 @@ $(function () {
 
       if (channel.id == urlParams.get('channel')) {
         channelBlock.find('.plus-icon').click()
+
+        // const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
+        // selectedTag.text(channel.name)
+        // selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+        // selectedTag.css('color', '#ffffff')
+        // selectedTag.css('background-color', '#1d1d1d')
+        // selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
+
         $(`<div class="channel-orientation">${channel.name}</div>`).insertAfter('.orientation-map .all-orientation')
         $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
       }

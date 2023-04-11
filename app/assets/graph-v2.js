@@ -80,7 +80,7 @@ function drawNetwork () {
   })
 
   const edge_data = $.map(edges, function (edge, i) {
-    if (edge.weight == 0 || !tag_ids.includes(edge.source_id.$oid) || !tag_ids.includes(edge.sink_id.$oid)) {
+    if (edge.weight == 0 || urlParams.getAll('tags[]').length == 0 || !tag_ids.includes(edge.source_id.$oid) || !tag_ids.includes(edge.sink_id.$oid)) {
       return null
     } else {
       let opacity = edge_min_opacity + (edge.weight / edge_opacity_scale)
@@ -159,11 +159,43 @@ function drawNetwork () {
     })
   }
 
+  const radar_data = []
+  if (urlParams.getAll('tags[]').length == 0) {
+    radar_data.push({
+      data: {
+        type: 'RADAR',
+        id: 'RADAR',
+        name: 'RADAR',
+        url: '/',
+        weight: 1,
+        width: 100,
+        color: '#A706FA',
+        opacity: 1
+      }
+    })
+    $.each(tags, function (i, tag) {
+      if (!tag_ids.includes(tag._id.$oid)) {
+        return null
+      } else {
+        edge_data.push({
+          data: {
+            id: `${tag._id.$oid}-RADAR`,
+            source: tag._id.$oid,
+            target: 'RADAR',
+            weight: 1,
+            color: '#999',
+            opacity: 0.5
+          }
+        })
+      }
+    })
+  }
+
   $('#graph').css('opacity', 0)
   const cy = cytoscape({
 
     container: $('#graph'),
-    elements: channel_data.concat(tag_data).concat(link_data).concat(edge_data),
+    elements: channel_data.concat(tag_data).concat(link_data).concat(edge_data).concat(radar_data),
     style: [
       {
         selector: 'node',
