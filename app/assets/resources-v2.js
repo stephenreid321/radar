@@ -6,7 +6,7 @@ $(function () {
   // sign in with Discord + profile page
   // tags in resource blocks?
 
-  $('.link-resources-block').css({ height: '35%', width: '100%' })
+  $('.link-resources-block').css('height', '35%')
   $('.map-right-wrapper').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -91,6 +91,19 @@ $(function () {
       })
       resourceBlock.find('.resource-title').click(function () { resourceBlock.find('.resource-drop').click() }).css('cursor', 'pointer')
 
+      $('<div class="tag-container-js"></div>').insertAfter(resourceBlock.find('.resource-expanded-content'))
+      $(link.tagships).each(function (i, tagship) {
+        const tag = $('.tags-showing-div .showing-tags').first().clone()
+        tag.text(tagship.tag.name)
+        if (urlParams.getAll('tags[]').includes(tagship.tag.name)) {
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagship.tag.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+          tag.css('background-color', '#1d1d1d')
+        } else {
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([tagship.tag.name]), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+        }
+        tag.appendTo(resourceBlock.find('.tag-container-js')).show()
+      })
+
       resourceBlock.appendTo($('.link-resources-block').first()).show()
     })
   })
@@ -131,12 +144,12 @@ $(function () {
       if (channel.id == urlParams.get('channel')) {
         channelBlock.find('.plus-icon').click()
 
-        // const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
-        // selectedTag.text(channel.name)
-        // selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-        // selectedTag.css('color', '#ffffff')
-        // selectedTag.css('background-color', '#1d1d1d')
-        // selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
+        const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
+        selectedTag.text(`${channel.name} ×`)
+        selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+        selectedTag.css('color', '#ffffff')
+        selectedTag.css('background-color', '#1d1d1d')
+        selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
 
         $(`<div class="channel-orientation">${channel.name}</div>`).insertAfter('.orientation-map .all-orientation')
         $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
