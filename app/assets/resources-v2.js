@@ -94,7 +94,7 @@ $(function () {
 
       $('<div class="tag-container-js"></div>').insertAfter(resourceBlock.find('.resource-expanded-content'))
       $(link.tagships).each(function (i, tagship) {
-        const tag = $('.tags-showing-div .showing-tags').first().clone()
+        const tag = $('.tags-showing-div .showing-tags').last().clone()
         tag.text(tagship.tag.name)
         if (urlParams.getAll('tags[]').includes(tagship.tag.name)) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagship.tag.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
