@@ -1,11 +1,13 @@
 $(function () {
-  // TODO
+  /* TODO */
   $('.minting-block').hide()
   $('.submit-tab').hide()
   $('.profile-tab').hide()
+  // tags in resource blocks?
 
   $('.link-resources-block').css({ height: '50%', width: '100%' })
   $('.map-right-wrapper').css('width', '100%')
+
   const urlParams = new URLSearchParams(window.location.search)
 
   /* orientation */
