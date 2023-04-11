@@ -3,7 +3,6 @@ $(function () {
   $('.minting-block').hide()
   $('.submit-tab').hide()
   $('.profile-tab').hide()
-  $('.tags-showing-div .small-copy.right-align').hide()
   $('.orientation-map').hide()
   $('.orientation-reset').hide()
 
@@ -32,6 +31,9 @@ $(function () {
     selectedTag.css('color', '#ffffff')
     selectedTag.css('background-color', '#1d1d1d')
     selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
+  })
+  $.get(`${BASE_URI}/tags/count`, function (data) {
+    $('.tags-showing-div .small-copy.right-align').text(`${tags.length}/${data.count} tags`)
   })
 
   /* resources */

@@ -107,6 +107,10 @@ module Radar
       links.limit(50).as_json(include: { message: {}, tagships: { include: :tag } }).to_json
     end
 
+    get '/tags/count', cache: true, provides: :json do
+      {count: Tag.count}.to_json
+    end
+
     get '/tags', cache: true, provides: :json do
       cache_key { "tags-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       tags = if params[:tags]
