@@ -80,7 +80,7 @@ function drawNetwork () {
   })
 
   const edge_data = $.map(edges, function (edge, i) {
-    if (edge.weight == 0 || urlParams.getAll('tags[]').length == 0 || !tag_ids.includes(edge.source_id.$oid) || !tag_ids.includes(edge.sink_id.$oid)) {
+    if (edge.weight == 0 || (urlParams.getAll('tags[]').length == 0 && !urlParams.get('channel') && !urlParams.get('q')) || !tag_ids.includes(edge.source_id.$oid) || !tag_ids.includes(edge.sink_id.$oid)) {
       return null
     } else {
       let opacity = edge_min_opacity + (edge.weight / edge_opacity_scale)
@@ -160,7 +160,7 @@ function drawNetwork () {
   }
 
   const radar_data = []
-  if (urlParams.getAll('tags[]').length == 0) {
+  if (urlParams.getAll('tags[]').length == 0 && !urlParams.get('channel') && !urlParams.get('q')) {
     radar_data.push({
       data: {
         type: 'RADAR',
@@ -203,7 +203,13 @@ function drawNetwork () {
           'background-color': 'data(color)',
           color: 'black',
           opacity: 'data(opacity)',
-          label: 'data(name)',
+          label: function (node) {
+            if (node.data('type') === 'link') {
+              return ''
+            } else {
+              return node.data('name')
+            }
+          },
           width: 'data(width)',
           height: 'data(width)'
         }
@@ -244,7 +250,9 @@ function drawNetwork () {
       window.open(link_node.data('url'))
     } else {
       $('#graph').fadeOut(function () {
-        if (node.data('type') == 'channel') {
+        if (node.data('type') == 'RADAR') {
+          window.location.href = '/'
+        } else if (node.data('type') == 'channel') {
           const channel_node = node
           if (urlParams.get('channel') == channel_node.data('id')) { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` } else { window.location.href = `/?${$.param({ channel: channel_node.data('id'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }
         } else if (node.data('type') == 'tag') {
@@ -257,6 +265,22 @@ function drawNetwork () {
   // cy.on('tap', 'edge', function () {
   //   window.location.href = `/?${$.param({ edge_id: this.data('id'), q: q })}`
   // });
+
+  cy.nodes('[type="link"]').qtip({
+    content: function () {
+      return this.data('name')
+    },
+    show: {
+      event: 'mouseover'
+    },
+    hide: {
+      event: 'mouseout'
+    },
+    style: {
+      classes: 'qtip-dark'
+    }
+  })
+
   cy.minZoom(0.5)
 }
 
@@ -280,7 +304,7 @@ $(function () {
       })
     })
   }).then(function () {
-    if (urlParams.getAll('tags[]').length > 0) {
+    if (urlParams.getAll('tags[]').length > 0 || urlParams.get('q')) {
       return $.get(`${BASE_URI}/links?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`, function (data) {
         links = data
       })

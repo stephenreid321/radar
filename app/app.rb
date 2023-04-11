@@ -66,20 +66,31 @@ module Radar
 
     get '/channels', cache: true, provides: :json do
       cache_key { 'channels' }
-      Message.pluck(:channel_id, :channel_name).uniq.map do |channel_id, channel_name|
+      channels = Message.pluck(:channel_id, :channel_name).uniq.select do |_channel_id, channel_name|
+        (channel_name =~ /\A[a-z]/i || channel_name =~ /signals-and-research/i) && (channel_name != ~ /intothefuture-promo-temp/i)
+      end.map do |channel_id, channel_name|
+        link_ids = Link.and(:message_id.in => Message.and(channel_id: channel_id).pluck(:id)).pluck(:id)
         {
           name: channel_name,
           id: channel_id,
           weight: 1,
-          tags: Tag.where(:id.in =>
-            Tagship.where(:link_id.in =>
-              Link.where(:message_id.in =>
-                Message.where(channel_id: channel_id).pluck(:id)).pluck(:id)).pluck(:tag_id)).pluck(:name)
+          tags: Tag.and(:id.in =>
+            Tagship.and(:link_id.in =>
+              Link.and(:message_id.in =>
+                Message.and(channel_id: channel_id).pluck(:id)).pluck(:id)).pluck(:tag_id)).map do |tag|
+                  count = Tagship.and(tag: tag).and(:link_id.in => link_ids).count
+                  { name: tag.name, count: count }
+                end
         }
       end
-             .select { |channel| channel[:tags].any? }
-             .sort_by { |channel| channel[:name] }
-             .to_json
+                        .compact
+                        .select { |channel| channel[:tags].any? }
+                        .sort_by { |channel| channel[:name] }
+
+      #  move daily signals to the top
+      channels = channels.partition { |channel| channel[:name] =~ /signals-and-research/i }.flatten
+
+      channels.to_json
     end
 
     get '/links/count', cache: true, provides: :json do
@@ -90,24 +101,24 @@ module Radar
       cache_key { "links-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       links = Link.order('posted_at desc')
       if params[:tags]
-        # Link.where(:id.in => Tagship.where(:tag_id.in => Tag.where(:name.in => params[:tags]).pluck(:id)).pluck(:link_id))
+        # Link.and(:id.in => Tagship.and(:tag_id.in => Tag.and(:name.in => params[:tags]).pluck(:id)).pluck(:link_id))
         link_ids = []
         params[:tags].each do |tag|
           if link_ids.empty?
-            link_ids = Tagship.where(tag: Tag.find_by(name: tag)).pluck(:link_id)
+            link_ids = Tagship.and(tag: Tag.find_by(name: tag)).pluck(:link_id)
           else
-            link_ids &= Tagship.where(tag: Tag.find_by(name: tag)).pluck(:link_id)
+            link_ids &= Tagship.and(tag: Tag.find_by(name: tag)).pluck(:link_id)
           end
         end
-        links = links.where(:id.in => link_ids)
+        links = links.and(:id.in => link_ids)
       end
       if params[:channel]
-        links = links.where(:message_id.in => Message.where(
+        links = links.and(:message_id.in => Message.and(
           channel_id: params[:channel]
         ).pluck(:id))
       end
       if params[:q]
-        links = links.where(:id.in => Link.or(
+        links = links.and(:id.in => Link.or(
           { 'data.title': /\b#{params[:q]}\b/i },
           { 'data.description': /\b#{params[:q]}\b/i },
           { :tags_downcase.in => [params[:q].downcase] }
@@ -124,34 +135,35 @@ module Radar
       cache_key { "tags-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       tags = if params[:tags]
                tag_ids = []
-               Tag.where(:name.in => params[:tags]).each do |tag|
-                 tag_ids_ = [tag.id] + tag.edges_as_source.where(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.where(:weight.gt => 0).pluck(:source_id)
+               Tag.and(:name.in => params[:tags]).each do |tag|
+                 tag_ids_ = [tag.id] + tag.edges_as_source.and(:weight.gt => 0).pluck(:sink_id) + tag.edges_as_sink.and(:weight.gt => 0).pluck(:source_id)
                  if tag_ids.empty?
                    tag_ids = tag_ids_
                  else
                    tag_ids &= tag_ids_
                  end
                end
-               Tag.where(:id.in => Tag.where(:name.in => params[:tags]).pluck(:id) + tag_ids)
+               Tag.and(:id.in => Tag.and(:name.in => params[:tags]).pluck(:id) + tag_ids)
              else
                Tag.all
              end
       if params[:channel]
-        tags = tags.where(
-          :id.in => Tagship.where(:link_id.in => Link.where(
-            :message_id.in => Message.where(
+        tags = tags.and(
+          :id.in => Tagship.and(:link_id.in => Link.and(
+            :message_id.in => Message.and(
               channel_id: params[:channel]
             ).pluck(:id)
           ).pluck(:id)).pluck(:tag_id)
         )
       end
       if params[:q]
-        tags = tags.where(
-          :id.in => Tagship.where(:link_id.in => Link.or(
+        links = params[:channel] ? Link.and(:message_id.in => Message.and(channel_id: params[:channel]).pluck(:id)) : Link.all
+        tags = tags.and(
+          :id.in => Tagship.and(:link_id.in => links.and(:id.in => Link.or(
             { 'data.title': /\b#{params[:q]}\b/i },
             { 'data.description': /\b#{params[:q]}\b/i },
             { :tags_downcase.in => [params[:q].downcase] }
-          ).pluck(:id)).pluck(:tag_id)
+          ).pluck(:id)).pluck(:id)).pluck(:tag_id)
         )
       end
       tags.as_json(include: [:edges_as_source, :edges_as_sink]).to_json

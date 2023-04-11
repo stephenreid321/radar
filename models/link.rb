@@ -39,7 +39,9 @@ class Link
       prompt: { type: :text_area, disabled: true },
       tags: { type: :text_area, disabled: true, full: true },
       posted_at: :datetime,
-      message_id: :lookup
+      message_id: :lookup,
+      tagships: :collection,
+      edgeships: :collection
     }
   end
 

@@ -27,7 +27,7 @@ class Tag
   end
 
   def links
-    Link.where(:tags.in => [name])
+    Link.and(:tags.in => [name])
   end
 
   after_create :create_tagships

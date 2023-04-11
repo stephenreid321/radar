@@ -11,9 +11,14 @@ class Tagship
 
   def self.admin_fields
     {
+      summary: { type: :text, edit: false },
       tag_id: :lookup,
       link_id: :lookup
     }
+  end
+
+  def summary
+    "#{tag.name} - #{link.title}"
   end
 
   after_create :update_tag_weight, unless: -> { skip_update_weight }

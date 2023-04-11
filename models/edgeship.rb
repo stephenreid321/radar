@@ -11,9 +11,14 @@ class Edgeship
 
   def self.admin_fields
     {
+      summary: { type: :text, edit: false },
       edge_id: :lookup,
       link_id: :lookup
     }
+  end
+
+  def summary
+    "#{edge.summary} : #{link.title}"
   end
 
   after_create :update_edge_weight, unless: -> { skip_update_weight }

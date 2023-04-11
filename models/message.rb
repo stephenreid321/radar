@@ -75,7 +75,7 @@ class Message
           Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data)
         end
       end
-      Link.taggable.where(tags: nil).each { |link| link.set_tags! }
+      Link.taggable.and(tags: nil).each { |link| link.set_tags! }
       tags = Tag.all
       c = tags.count
       tags.each_with_index do |tag, i|

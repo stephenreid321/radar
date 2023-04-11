@@ -36,7 +36,7 @@ class Edge
   end
 
   def links
-    Link.where(:id.in => source.tagships.pluck(:link_id) & sink.tagships.pluck(:link_id))
+    Link.and(:id.in => source.tagships.pluck(:link_id) & sink.tagships.pluck(:link_id))
   end
 
   after_create :create_edgeships

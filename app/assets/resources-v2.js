@@ -2,10 +2,11 @@ $(function () {
   /* TODO */
   $('.submit-tab').hide()
   $('.profile-tab').hide()
+  $('.minting-block').hide()
   // sign in with Discord + profile page
   // tags in resource blocks?
 
-  $('.link-resources-block').css({ height: '50%', width: '100%' })
+  $('.link-resources-block').css({ height: '35%', width: '100%' })
   $('.map-right-wrapper').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -123,7 +124,9 @@ $(function () {
             })
         }
       }).css('cursor', 'pointer')
-      channelBlock.find('.channel-title a.channel-title').click(function () { channelBlock.find('.plus-icon').click() }).css('cursor', 'pointer')
+      channelBlock.find('.channel-title a.channel-title').click(function () {
+        window.location.href = `/?${$.param({ channel: channel.id, tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
+      }).css('cursor', 'pointer')
 
       if (channel.id == urlParams.get('channel')) {
         channelBlock.find('.plus-icon').click()
@@ -141,14 +144,14 @@ $(function () {
 
       channelBlock.find('.tags-button-container .tag-div-button').hide()
       channelBlock.find('.tag-counter').text(channel.tags.length)
-      $(channel.tags).each(function (i, tagName) {
+      $(channel.tags).each(function (i, tagObj) {
         const tag = channelBlock.find('.tags-button-container .tag-div-button').first().clone()
-        tag.text(tagName)
-        if (channel.id == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tagName)) {
-          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagName }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+        tag.text(`${tagObj.name} (${tagObj.count})`)
+        if (channel.id == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tagObj.name)) {
+          tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagObj.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
           tag.addClass('selected')
         } else {
-          const tags = (channel.id == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tagName]) : [tagName])
+          const tags = (channel.id == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tagObj.name]) : [tagObj.name])
           tag.click(function () { window.location.href = `/?${$.param({ channel: channel.id, tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         }
         tag.appendTo(channelBlock.find('.tags-button-container')).show()
