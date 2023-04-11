@@ -3,6 +3,7 @@ $(function () {
   $('.submit-tab').hide()
   $('.profile-tab').hide()
   $('.minting-block').hide()
+  $('.tags-showing-div .small-copy.caps').first().remove()
   // sign in with Discord + profile page
   // tags in resource blocks?
 
