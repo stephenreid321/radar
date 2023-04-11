@@ -49,7 +49,8 @@ module Radar
     end
 
     get '/random' do
-      redirect "#{ENV['WEBFLOW_URL'] if Padrino.env == :production}/?tags[]=#{Tag.collection.aggregate([{ '$sample': { size: 1 } }]).first['name']}"
+      t = Tag.collection.aggregate([{ '$sample': { size: 1 } }]).first['name']
+      redirect "#{ENV['WEBFLOW_URL'] if Padrino.env == :production}/?tags[]=#{CGI.escape(t)}"
     end
 
     get '/invite' do
