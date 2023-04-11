@@ -40,7 +40,7 @@ $(function () {
     const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
     selectedTag.text(`${tag} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-    selectedTag.css('color', '#000000')
+    selectedTag.css('color', '#ffffff')
     selectedTag.css('background-color', '#A706FA')
     selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
 
@@ -97,7 +97,7 @@ $(function () {
         tag.text(tagship.tag.name)
         if (urlParams.getAll('tags[]').includes(tagship.tag.name)) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagship.tag.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-          tag.css('color', '#000000')
+          tag.css('color', '#ffffff')
           tag.css('background-color', '#A706FA')
         } else {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([tagship.tag.name]), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
