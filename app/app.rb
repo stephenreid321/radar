@@ -78,7 +78,7 @@ module Radar
             Tagship.and(:link_id.in =>
               Link.and(:message_id.in =>
                 Message.and(channel_id: channel_id).pluck(:id)).pluck(:id)).pluck(:tag_id)).map do |tag|
-                  count = Tagship.and(tag: tag).and(:link_id.in => link_ids).count
+                  count = Padrino.env == :development ? 0 : Tagship.and(tag: tag).and(:link_id.in => link_ids).count
                   { name: tag.name, count: count }
                 end
         }

@@ -38,7 +38,7 @@ $(function () {
   tags = tags.filter(function (item, pos) { return tags.indexOf(item) == pos }) // unique tags
   $(tags).each(function (i, tag) {
     const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
-    selectedTag.text(tag)
+    selectedTag.text(`${tag} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
     selectedTag.css('color', '#ffffff')
     selectedTag.css('background-color', '#1d1d1d')
