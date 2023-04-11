@@ -41,7 +41,11 @@ module Radar
     end
 
     get '/' do
-      Faraday.get('https://radar-knowledge-graph.webflow.io/').body.gsub('https://radar-knowledgegraph-weh6u.ondigitalocean.app', ENV['BASE_URI'])
+      Faraday.get(ENV['WEBFLOW_URL']).body.gsub(ENV['DO_URL'], ENV['BASE_URI'])
+    end
+
+    get '/v1' do
+      Faraday.get(ENV['WEBFLOW_V1_URL']).body.gsub(ENV['DO_URL'], ENV['BASE_URI'])
     end
 
     get '/invite' do
