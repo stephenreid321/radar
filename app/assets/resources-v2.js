@@ -21,14 +21,14 @@ $(function () {
   $('.orientation-reset .orientation-random').css('cursor', 'pointer').click(function () { window.location.href = `${BASE_URI}/random` })
 
   /* search */
-  $('.w-form').hide()
+  $('.explore-tab-content .w-form').hide()
   const searchForm = $('<form style="margin-bottom: 15px"><input name="channel" type="hidden"><input name="q" type="text" class="w-input input-box" /></form>')
   searchForm.find('input[name=channel]').val(urlParams.get('channel'))
   searchForm.find('input[name=q]').val(urlParams.get('q'))
   $.each(urlParams.getAll('tags[]'), function (i, tag) {
     searchForm.append(`<input name="tags[]" type="hidden" value="${tag}">`)
   })
-  searchForm.insertBefore('.w-form')
+  searchForm.insertBefore('.explore-tab-content .w-form')
 
   /* selected tags */
   $('.tags-showing-div .showing-tags').hide()
