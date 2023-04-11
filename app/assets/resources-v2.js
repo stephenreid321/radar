@@ -1,6 +1,5 @@
 $(function () {
   /* TODO */
-  $('.minting-block').hide()
   $('.submit-tab').hide()
   $('.profile-tab').hide()
   // tags in resource blocks?
@@ -9,6 +8,11 @@ $(function () {
   $('.map-right-wrapper').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
+
+  /* minting block */
+  $.get(`${BASE_URI}/links/count`, function (data) {
+    $('.minting-block .small-copy.right-align').text(`TOTAL SIGNALS: ${data.count}`)
+  })
 
   /* orientation */
   $('.orientation').css('z-index', '99')

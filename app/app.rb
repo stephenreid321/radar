@@ -81,6 +81,10 @@ module Radar
              .to_json
     end
 
+    get '/links/count', cache: true, provides: :json do
+      { count: Link.count }.to_json
+    end
+
     get '/links', cache: true, provides: :json do
       cache_key { "links-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       links = Link.order('posted_at desc')
