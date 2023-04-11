@@ -4,7 +4,6 @@ $(function () {
   $('.submit-tab').hide()
   $('.profile-tab').hide()
   $('.tags-showing-div .small-copy.right-align').hide()
-  $('.w-form').hide()
   $('.orientation-map').hide()
   $('.orientation-reset').hide()
 
@@ -12,11 +11,20 @@ $(function () {
   $('.map-right-wrapper').css('width', '100%')
   const urlParams = new URLSearchParams(window.location.search)
 
+  /* search */
+  $('.w-form').hide()
+  const searchForm = $('<form style="margin-bottom: 15px"><input name="channel" type="hidden"><input name="q" type="text" class="w-input input-box" /></form>')
+  searchForm.find('input[name=channel]').val(urlParams.get('channel'))
+  searchForm.find('input[name=q]').val(urlParams.get('q'))
+  $.each(urlParams.getAll('tags[]'), function (i, tag) {
+    searchForm.append(`<input name="tags[]" type="hidden" value="${tag}">`)
+  })
+  searchForm.insertBefore('.w-form')
+
   /* selected tags */
   $('.tags-showing-div .showing-tags').hide()
-  // unique tags
   let tags = urlParams.getAll('tags[]')
-  tags = tags.filter(function (item, pos) { return tags.indexOf(item) == pos })
+  tags = tags.filter(function (item, pos) { return tags.indexOf(item) == pos }) // unique tags
   $(tags).each(function (i, tag) {
     const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
     selectedTag.text(tag)
@@ -106,6 +114,7 @@ $(function () {
       }
 
       channelBlock.find('.tags-button-container .tag-div-button').hide()
+      channelBlock.find('.tag-counter').text(channel.tags.length)
       $(channel.tags).each(function (i, tagName) {
         const tag = channelBlock.find('.tags-button-container .tag-div-button').first().clone()
         tag.text(tagName)
