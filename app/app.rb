@@ -49,7 +49,7 @@ module Radar
     end
 
     get '/random' do
-      redirect "/?tags[]=#{Tag.collection.aggregate([{ '$sample': { size: 1 } }]).first['name']}"
+      redirect "#{request.referrer.split('/').first if request.referrer}/?tags[]=#{Tag.collection.aggregate([{ '$sample': { size: 1 } }]).first['name']}"
     end
 
     get '/invite' do

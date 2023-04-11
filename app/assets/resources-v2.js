@@ -14,7 +14,7 @@ $(function () {
   $('.orientation').css('z-index', '99')
   $('.orientation-map').html('<div class="all-orientation">ALL</div>')
   $('.orientation-reset .orientation-reset').css('cursor', 'pointer').click(function () { window.location.href = '/' })
-  $('.orientation-reset .orientation-random').css('cursor', 'pointer').click(function () { window.location.href = '/random' })
+  $('.orientation-reset .orientation-random').css('cursor', 'pointer').click(function () { window.location.href = `${BASE_URI}/random` })
 
   /* search */
   $('.w-form').hide()
