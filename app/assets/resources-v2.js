@@ -113,12 +113,14 @@ $(function () {
   /* channels */
 
   const channel_name = urlParams.get('channel')
-  const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
-  selectedTag.text(`${channel_name} ×`)
-  selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-  selectedTag.css('color', '#000000')
-  selectedTag.css('background-color', '#FAC707')
-  selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
+  if (channel_name) {
+    const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
+    selectedTag.text(`${channel_name} ×`)
+    selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+    selectedTag.css('color', '#000000')
+    selectedTag.css('background-color', '#FAC707')
+    selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
+  }
 
   $(`<div class="channel-orientation">${channel_name}</div>`).insertAfter('.orientation-map .all-orientation')
   $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
