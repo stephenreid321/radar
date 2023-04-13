@@ -80,7 +80,14 @@ function drawNetwork () {
   })
 
   const edge_data = $.map(edges, function (edge, i) {
-    if (edge.weight == 0 || urlParams.get('q') || (urlParams.getAll('tags[]').length == 0 && !urlParams.get('channel') && !urlParams.get('q')) || !tag_ids.includes(edge.source_id.$oid) || !tag_ids.includes(edge.sink_id.$oid)) {
+    if (
+      urlParams.get('q') ||
+      (urlParams.get('channel') && urlParams.getAll('tags[]').length == 0) ||
+      (!urlParams.get('channel') && urlParams.getAll('tags[]').length == 0 && !urlParams.get('q')) ||
+      edge.weight == 0 ||
+      !tag_ids.includes(edge.source_id.$oid) ||
+      !tag_ids.includes(edge.sink_id.$oid)
+    ) {
       return null
     } else {
       let opacity = edge_min_opacity + (edge.weight / edge_opacity_scale)

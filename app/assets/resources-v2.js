@@ -8,7 +8,6 @@ $(function () {
   // tags in resource blocks?
 
   $('.map-right-wrapper').css('width', '100%')
-  $('.link-resources-block').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
 
@@ -51,6 +50,12 @@ $(function () {
   $.get(`${BASE_URI}/tags/count`, function (data) {
     $('.tags-showing-div .small-copy.right-align').text(`${tags.length}/${data.count} tags`)
   })
+
+  /* search term */
+  if (urlParams.get('q')) {
+    $('<div class="arrow">></div>').appendTo('.orientation-map')
+    $(`<div class="tag-orientation">${urlParams.get('q')}</div>`).appendTo('.orientation-map')
+  }
 
   /* resources */
   $('.resource-block').hide()
