@@ -292,7 +292,7 @@ let links = []
 const edges = []
 
 $(function () {
-  $('<div id="graph" style="height: 50%; width: 100%"></div>').insertAfter('.orientation')
+  $('<div id="graph" style="height: 100%; width: 100%"></div>').insertAfter('.orientation')
 
   $.get(`${BASE_URI}/channels`, function (data) {
     channels = data
