@@ -154,7 +154,7 @@ $(function () {
         }
       }).css('cursor', 'pointer')
       channelBlock.find('.channel-title a.channel-title').click(function () {
-        window.location.href = `/?${$.param({ channel: channel.name, tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
+        window.location.href = `/?${$.param({ channel: channel.name, q: urlParams.get('q') })}`
       }).css('cursor', 'pointer')
 
       if (channel.name == urlParams.get('channel')) {
