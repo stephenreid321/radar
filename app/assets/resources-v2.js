@@ -8,6 +8,7 @@ $(function () {
   // tags in resource blocks?
 
   $('.map-right-wrapper').css('width', '100%')
+  $('.link-resources-block').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
 
