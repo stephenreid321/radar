@@ -7,7 +7,6 @@ $(function () {
   // sign in with Discord + profile page
   // tags in resource blocks?
 
-  $('.link-resources-block').css('height', '35%')
   $('.map-right-wrapper').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -129,7 +128,7 @@ $(function () {
   $.get(`${BASE_URI}/channels`, function (data) {
     $(data).each(function (i, channel) {
       const channelBlock = $('.channel-tag-wrapper').first().clone()
-      channelBlock.find('.channel-title a.channel-title').text(channel.name)
+      channelBlock.find('.channel-title a.channel-title').text(channel.name.replace('📚｜', 'PLAY '))
 
       channelBlock.find('.tags-button-container').css('height', 'auto').hide()
       channelBlock.find('.plus-icon').click(function () {
