@@ -3,6 +3,7 @@ class Link
   include Mongoid::Timestamps
 
   belongs_to :message, index: true
+  belongs_to :channel, index: true
 
   has_many :tagships, dependent: :destroy
   has_many :edgeships, dependent: :destroy
@@ -19,11 +20,14 @@ class Link
   index({ tags: 1 })
   index({ tags_downcase: 1 })
 
-  validates_presence_of :url, :data
+  validates_presence_of :url, :data, :posted_at
   validates_uniqueness_of :url, scope: :message_id
 
   before_validation do
-    self.posted_at = message.posted_at if posted_at.blank?
+    if message
+      self.posted_at = message.posted_at if posted_at.blank?
+      self.channel = message.channel if channel.blank?
+    end
   end
 
   after_create do

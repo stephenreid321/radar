@@ -3,14 +3,12 @@ class Message
   include Mongoid::Timestamps
 
   has_many :links, dependent: :destroy
+  belongs_to :channel, index: true
 
   field :discord_id, type: String
-  field :channel_id, type: String
-  field :channel_name, type: String
   field :data, type: Hash
 
   index({ discord_id: 1 }, { unique: true })
-  index({ channel_id: 1 })
 
   validates_presence_of :discord_id, :data
   validates_uniqueness_of :discord_id
@@ -18,8 +16,7 @@ class Message
   def self.admin_fields
     {
       discord_id: :text,
-      channel_id: :text,
-      channel_name: :text,
+      channel_id: :lookup,
       data: { type: :text_area, disabled: true }
     }
   end
@@ -66,13 +63,14 @@ class Message
       tc = threads.count
       threads.each_with_index do |thread, i|
         puts "thread #{i + 1}/#{tc}"
-        channel = thread
-        channel = JSON.parse(DISCORD.get("channels/#{thread['parent_id']}").body) while [10, 11, 12].include?(channel['type'])
-        channel_id = thread['parent_id']
-        channel_name = channel['name']
+        channel_json = thread
+        channel_json = JSON.parse(DISCORD.get("channels/#{thread['parent_id']}").body) while [10, 11, 12].include?(channel_json['type'])
+
+        channel = Channel.find_or_create_by(name: channel_json['name'], discord_id: thread['parent_id'])
+        next unless channel.persisted?
 
         JSON.parse(DISCORD.get("channels/#{thread['id']}/messages").body).each do |message_data|
-          Message.create(discord_id: message_data['id'], channel_id: channel_id, channel_name: channel_name, data: message_data)
+          channel.messages.create(discord_id: message_data['id'], data: message_data)
         end
       end
       Link.taggable.and(tags: nil).each { |link| link.set_tags! }

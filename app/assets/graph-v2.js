@@ -29,18 +29,18 @@ function drawNetwork () {
 
   const channel_data = $.map(channels, function (channel, i) {
     let color
-    if (urlParams.get('channel') == channel.id) { color = '#FAC706' } else { color = scale(channel_min_color + (channel.weight / channel_color_scale)).hex() }
+    if (urlParams.get('channel') == channel.name) { color = '#FAC706' } else { color = scale(channel_min_color + (channel.weight / channel_color_scale)).hex() }
 
     let opacity = channel_min_opacity + (channel.weight / channel_opacity_scale)
     if (opacity > 1) opacity = 1
 
-    if (urlParams.get('channel') != channel.id) {
+    if (urlParams.get('channel') != channel.name) {
       return null
     } else {
       return {
         data: {
           type: 'channel',
-          id: channel.id,
+          id: channel.name,
           name: channel.name,
           weight: channel.weight,
           width: (channel_min_width + ((channel_min_width * channel_width_multiplier) * channel.weight / channel_color_scale)),
@@ -147,7 +147,7 @@ function drawNetwork () {
       } else {
         edge_data.push({
           data: {
-            id: `${tag._id.$oid}-${channel.id}`,
+            id: `${tag._id.$oid}-${channel}`,
             source: tag._id.$oid,
             target: channel,
             weight: 1,

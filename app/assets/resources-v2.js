@@ -111,6 +111,18 @@ $(function () {
   })
 
   /* channels */
+
+  const channel_name = urlParams.get('channel')
+  const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
+  selectedTag.text(`${channel_name} ×`)
+  selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+  selectedTag.css('color', '#000000')
+  selectedTag.css('background-color', '#FAC707')
+  selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
+
+  $(`<div class="channel-orientation">${channel_name}</div>`).insertAfter('.orientation-map .all-orientation')
+  $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
+
   $('.channel-tag-wrapper').hide()
   $.get(`${BASE_URI}/channels`, function (data) {
     $(data).each(function (i, channel) {
@@ -140,21 +152,11 @@ $(function () {
         }
       }).css('cursor', 'pointer')
       channelBlock.find('.channel-title a.channel-title').click(function () {
-        window.location.href = `/?${$.param({ channel: channel.id, tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
+        window.location.href = `/?${$.param({ channel: channel.name, tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}`
       }).css('cursor', 'pointer')
 
-      if (channel.id == urlParams.get('channel')) {
+      if (channel.name == urlParams.get('channel')) {
         channelBlock.find('.plus-icon').click()
-
-        const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
-        selectedTag.text(`${channel.name} ×`)
-        selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-        selectedTag.css('color', '#000000')
-        selectedTag.css('background-color', '#FAC707')
-        selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
-
-        $(`<div class="channel-orientation">${channel.name}</div>`).insertAfter('.orientation-map .all-orientation')
-        $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
       }
 
       channelBlock.find('.tags-button-container .tag-div-button').hide()
@@ -162,12 +164,12 @@ $(function () {
       $(channel.tags).each(function (i, tagObj) {
         const tag = channelBlock.find('.tags-button-container .tag-div-button').first().clone()
         tag.text(`${tagObj.name} (${tagObj.count})`)
-        if (channel.id == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tagObj.name)) {
+        if (channel.name == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tagObj.name)) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagObj.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
           tag.addClass('selected')
         } else {
-          const tags = (channel.id == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tagObj.name]) : [tagObj.name])
-          tag.click(function () { window.location.href = `/?${$.param({ channel: channel.id, tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
+          const tags = (channel.name == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tagObj.name]) : [tagObj.name])
+          tag.click(function () { window.location.href = `/?${$.param({ channel: channel.name, tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         }
         tag.appendTo(channelBlock.find('.tags-button-container')).show()
       })

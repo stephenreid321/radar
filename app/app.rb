@@ -66,21 +66,12 @@ module Radar
 
     get '/channels', cache: true, provides: :json do
       cache_key { 'channels' }
-      channels = Message.pluck(:channel_id, :channel_name).uniq.select do |_channel_id, channel_name|
-        (channel_name =~ /\A[a-z]/i || channel_name =~ /signals-and-research/i) && (channel_name != ~ /intothefuture-promo-temp/i)
-      end.map do |channel_id, channel_name|
-        link_ids = Link.and(:message_id.in => Message.and(channel_id: channel_id).pluck(:id)).pluck(:id)
+      channels = Channel.all.map do |channel|        
         {
-          name: channel_name,
-          id: channel_id,
+          name: channel.name,
+          id: channel.id,
           weight: 1,
-          tags: Tag.and(:id.in =>
-            Tagship.and(:link_id.in =>
-              Link.and(:message_id.in =>
-                Message.and(channel_id: channel_id).pluck(:id)).pluck(:id)).pluck(:tag_id)).map do |tag|
-                  count = Padrino.env == :development ? 0 : Tagship.and(tag: tag).and(:link_id.in => link_ids).count
-                  { name: tag.name, count: count }
-                end
+          tags: channel.tags_with_count
         }
       end
                         .compact
@@ -101,7 +92,6 @@ module Radar
       cache_key { "links-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       links = Link.order('posted_at desc')
       if params[:tags]
-        # Link.and(:id.in => Tagship.and(:tag_id.in => Tag.and(:name.in => params[:tags]).pluck(:id)).pluck(:link_id))
         link_ids = []
         params[:tags].each do |tag|
           if link_ids.empty?
@@ -113,9 +103,7 @@ module Radar
         links = links.and(:id.in => link_ids)
       end
       if params[:channel]
-        links = links.and(:message_id.in => Message.and(
-          channel_id: params[:channel]
-        ).pluck(:id))
+        links = links.and(:message_id.in => Channel.find_by(name: params[:channel]).messages.pluck(:id))
       end
       if params[:q]
         links = links.and(:id.in => Link.or(
@@ -149,15 +137,13 @@ module Radar
              end
       if params[:channel]
         tags = tags.and(
-          :id.in => Tagship.and(:link_id.in => Link.and(
-            :message_id.in => Message.and(
-              channel_id: params[:channel]
-            ).pluck(:id)
-          ).pluck(:id)).pluck(:tag_id)
+          :id.in => Tagship.and(
+            :link_id.in => Channel.find_by(name: params[:channel]).links.pluck(:id)
+          ).pluck(:tag_id)
         )
       end
       if params[:q]
-        links = params[:channel] ? Link.and(:message_id.in => Message.and(channel_id: params[:channel]).pluck(:id)) : Link.all
+        links = params[:channel] ? Channel.find_by(name: params[:channel]).links : Link.all
         tags = tags.and(
           :id.in => Tagship.and(:link_id.in => links.and(:id.in => Link.or(
             { 'data.title': /\b#{params[:q]}\b/i },
