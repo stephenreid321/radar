@@ -44,6 +44,7 @@ class Link
       tags: { type: :text_area, disabled: true, full: true },
       posted_at: :datetime,
       message_id: :lookup,
+      channel_id: :lookup,
       tagships: :collection,
       edgeships: :collection
     }
