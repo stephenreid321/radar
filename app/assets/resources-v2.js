@@ -120,10 +120,10 @@ $(function () {
     selectedTag.css('color', '#000000')
     selectedTag.css('background-color', '#FAC707')
     selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
-  }
 
-  $(`<div class="channel-orientation">${channel_name}</div>`).insertAfter('.orientation-map .all-orientation')
-  $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
+    $(`<div class="channel-orientation">${channel_name}</div>`).insertAfter('.orientation-map .all-orientation')
+    $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
+  }
 
   $('.channel-tag-wrapper').hide()
   $.get(`${BASE_URI}/channels`, function (data) {
