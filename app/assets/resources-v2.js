@@ -4,13 +4,15 @@ $(function () {
   $('.explore-tab-content:eq(1)').remove()
   $('a[href="/profile-page"]').hide() // profile link
   // $('.minting-block').hide()
-  // $('.tags-showing-div .small-copy.caps').first().remove()
   // sign in with Discord + profile page
   // tags in resource blocks?
 
   $('.map-right-wrapper').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
+  if (!urlParams.get('channel') && urlParams.getAll('tags[]').length == 0 && !urlParams.get('q')) {
+    $('.tags-showing-div .small-copy.caps').first().hide()
+  }
 
   /* minting block */
   $.get(`${BASE_URI}/links/count`, function (data) {
