@@ -47,7 +47,7 @@ function drawNetwork () {
         data: {
           type: 'channel',
           id: channel.name,
-          name: channel.name,
+          name: channel.name.replace('📚｜', 'play '),
           weight: channel.weight,
           width: (channel_min_width + ((channel_min_width * channel_width_multiplier) * channel.weight / channel_max_weight)),
           'border-color': channel_border_color,
