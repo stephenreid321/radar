@@ -1,41 +1,34 @@
 function drawNetwork () {
-  const tag_color_scale = chroma.scale(['#ffffff', '#2500FF'])
-
-  const radar_bg_color = '#2500FF' // blue
-  const radar_border_color = '#2500FF' // blue
-  const channel_bg_color = '#000000'
-  const channel_border_color = '#2500FF' // blue
-  const tag_bg_color = '#2500FF'
-  // const tag_border_color = '#2500FF' // blue
-  const link_bg_color = '#ffffff'
-  const link_border_color = '#2500FF' // blue
-
-  const radar_edge_color = '#2500FF' // blue
+  const radar_bg_color = '#000000'
+  const radar_border_color = '#2500FF'
+  const radar_edge_color = '#2500FF'
   const radar_edge_line_style = 'solid'
-  const channel_edge_color = '#2500FF' // blue
-  const channel_edge_line_style = 'solid'
-  // const tag_edge_color = '#2500FF' // blue
-  // const tag_edge_line_style = 'solid'
-  const link_edge_color = '#2500FF' // blue
-  const link_edge_line_style = 'dashed'
 
   const channel_max_weight = Math.max.apply(null, $(channels).map(function (i, channel) { return channel.weight }))
   const channel_min_width = 10
   const channel_width_multiplier = 10
-  // const channel_min_color = 0.25
   const channel_min_opacity = 1
+  const channel_bg_color = '#000000'
+  const channel_border_color = '#2500FF'
+  const channel_edge_color = '#2500FF'
+  const channel_edge_line_style = 'solid'
 
   const tag_max_weight = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
   const tag_min_width = 10
   const tag_width_multiplier = 10
   const tag_min_color = 0.25
   const tag_min_opacity = 1
+  const tag_color_scale = chroma.scale(['#ffffff', '#2500FF'])
+  const tag_bg_color = '#2500FF'
 
   const link_max_weight = Math.max.apply(null, $(links).map(function (i, link) { link.weight = 1; return link.weight }))
   const link_min_width = 2.5
   const link_width_multiplier = 10
-  // const link_min_color = 0.25
   const link_min_opacity = 1
+  const link_bg_color = '#ffffff'
+  const link_border_color = '#2500FF'
+  const link_edge_color = '#2500FF'
+  const link_edge_line_style = 'dashed'
 
   const edge_max_weight = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
   const edge_min_color = 1

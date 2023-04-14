@@ -9,7 +9,6 @@
 
 .tag-div-button.selected,
 .tag-div-button:active {
-  border-color: blue;
   background-color: blue;
 }
 
