@@ -3,9 +3,6 @@ $(function () {
   $('.explore-tabs-menu > a').last().hide() // share tab
   $('.explore-tab-content:eq(1)').remove()
   $('a[href="/profile-page"]').hide() // profile link
-  // $('.minting-block').hide()
-  // sign in with Discord + profile page
-  // tags in resource blocks?
 
   $('.map-right-wrapper').css('width', '100%')
 
