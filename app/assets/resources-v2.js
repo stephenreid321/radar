@@ -124,7 +124,7 @@ $(function () {
   const channel_name = urlParams.get('channel')
   if (channel_name) {
     const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
-    selectedTag.text(`${channel_name} ×`)
+    selectedTag.text(`${channel_name.replace('📚｜', 'PLAY ')} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
     selectedTag.addClass('js-selected-channel')
     selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
