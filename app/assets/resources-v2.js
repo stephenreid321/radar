@@ -4,7 +4,7 @@ $(function () {
   $('.explore-tab-content:eq(1)').remove()
   $('a[href="/profile-page"]').hide() // profile link
   // $('.minting-block').hide()
-  $('.tags-showing-div .small-copy.caps').first().remove()
+  // $('.tags-showing-div .small-copy.caps').first().remove()
   // sign in with Discord + profile page
   // tags in resource blocks?
 
