@@ -1,5 +1,19 @@
 function drawNetwork () {
-  const scale = chroma.scale(['#fff', '#999'])
+  const scale = chroma.scale(['#ffffff', '#2500FF'])
+
+  const channel_bg_color = '#000000'
+  const channel_border_color = '#2500FF' // blue
+  const tag_bg_color = '#2500FF'
+  const tag_border_color = '#2500FF' // blue
+  const link_bg_color = '#ffffff'
+  const link_border_color = '#2500FF' // blue
+
+  const channel_edge_color = '#2500FF' // blue
+  const channel_edge_line_style = 'solid'
+  const tag_edge_color = '#2500FF' // blue
+  const tag_edge_line_style = 'solid'
+  const link_edge_color = '#2500FF' // blue
+  const link_edge_line_style = 'dashed'
 
   const channel_min_width = 10
   const channel_width_multiplier = 10
@@ -29,7 +43,7 @@ function drawNetwork () {
 
   const channel_data = $.map(channels, function (channel, i) {
     let color
-    if (urlParams.get('channel') == channel.name) { color = '#FAC706' } else { color = scale(channel_min_color + (channel.weight / channel_color_scale)).hex() }
+    if (urlParams.get('channel') == channel.name) { color = channel_bg_color } else { color = scale(channel_min_color + (channel.weight / channel_color_scale)).hex() }
 
     let opacity = channel_min_opacity + (channel.weight / channel_opacity_scale)
     if (opacity > 1) opacity = 1
@@ -44,6 +58,7 @@ function drawNetwork () {
           name: channel.name,
           weight: channel.weight,
           width: (channel_min_width + ((channel_min_width * channel_width_multiplier) * channel.weight / channel_color_scale)),
+          'border-color': channel_border_color,
           color,
           opacity
         }
@@ -53,7 +68,7 @@ function drawNetwork () {
 
   const tag_data = $.map(tags, function (tag, i) {
     let color
-    if (urlParams.getAll('tags[]').includes(tag.name)) { color = '#A706FA' } else { color = scale(tag_min_color + (tag.weight / tag_color_scale)).hex() }
+    if (urlParams.getAll('tags[]').includes(tag.name)) { color = tag_bg_color } else { color = scale(tag_min_color + (tag.weight / tag_color_scale)).hex() }
 
     let opacity = tag_min_opacity + (tag.weight / tag_opacity_scale)
     if (opacity > 1) opacity = 1
@@ -68,6 +83,7 @@ function drawNetwork () {
           name: tag.name,
           weight: tag.weight,
           width: (tag_min_width + ((tag_min_width * tag_width_multiplier) * tag.weight / tag_color_scale)),
+          'border-color': color,
           color,
           opacity
         }
@@ -108,7 +124,7 @@ function drawNetwork () {
 
   const link_data = $.map(links, function (link, i) {
     link.weight = 1
-    const color = '#07FA98'
+    const color = link_bg_color
 
     let opacity = link_min_opacity + (link.weight / link_opacity_scale)
     if (opacity > 1) opacity = 1
@@ -121,6 +137,7 @@ function drawNetwork () {
         url: link.data.url,
         weight: link.weight,
         width: (link_min_width + ((link_min_width * link_width_multiplier) * link.weight / link_color_scale)),
+        'border-color': link_border_color,
         color,
         opacity
       }
@@ -138,7 +155,8 @@ function drawNetwork () {
             source: tagship.tag_id.$oid,
             target: link._id.$oid,
             weight: 1,
-            color: '#999',
+            color: link_edge_color,
+            'line-style': link_edge_line_style,
             opacity: 0.5
           }
         })
@@ -158,7 +176,8 @@ function drawNetwork () {
             source: tag._id.$oid,
             target: channel,
             weight: 1,
-            color: '#999',
+            color: channel_edge_color,
+            'line-style': channel_edge_line_style,
             opacity: 0.5
           }
         })
@@ -190,7 +209,8 @@ function drawNetwork () {
             source: tag._id.$oid,
             target: 'RADAR',
             weight: 1,
-            color: '#999',
+            color: tag_edge_color,
+            'line-style': tag_edge_line_style,
             opacity: 0.5
           }
         })
@@ -210,6 +230,9 @@ function drawNetwork () {
           'background-color': 'data(color)',
           color: 'black',
           opacity: 'data(opacity)',
+          'border-width': '1px',
+          'border-style': 'solid',
+          'border-color': function (node) { return node.data('border-color') },
           label: function (node) {
             if (node.data('type') === 'link') {
               return ''
@@ -225,7 +248,8 @@ function drawNetwork () {
         selector: 'edge',
         style: {
           opacity: 'data(opacity)',
-          'line-color': 'data(color)'
+          'line-color': 'data(color)',
+          'line-style': function (node) { return node.data('line-style') }
         }
       }
     ],
@@ -317,7 +341,11 @@ $(function () {
       })
     }
   }).then(function () {
-    drawNetwork()
-    $(window).one('focus', function () { drawNetwork() })
+    if (urlParams.get('q') && links.length == 0) {
+      $('.no-signals-div').show()
+    } else {
+      drawNetwork()
+      $(window).one('focus', function () { drawNetwork() })
+    }
   })
 })

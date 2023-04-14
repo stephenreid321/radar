@@ -6,7 +6,7 @@ module Radar
     register Padrino::Cache
     helpers Activate::ParamHelpers
 
-    enable :caching unless Padrino.env == :development
+    enable :caching
     use Rack::Session::Cookie, expire_after: 1.year.to_i, secret: ENV['SESSION_SECRET']
     set :public_folder, Padrino.root('app', 'assets')
     use Rack::Cors do

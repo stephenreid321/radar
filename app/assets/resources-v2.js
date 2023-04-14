@@ -1,8 +1,9 @@
 $(function () {
   /* TODO */
-  $('.submit-tab').hide()
-  $('.profile-tab').hide()
-  // $('.minting-block').hide()
+  $('.explore-tabs-menu > a').last().hide() // share tab
+  $('.explore-tab-content:eq(1)').remove()
+  $('a[href="/profile-page"]').hide() // profile link
+  $('.minting-block').hide()
   $('.tags-showing-div .small-copy.caps').first().remove()
   // sign in with Discord + profile page
   // tags in resource blocks?
@@ -23,14 +24,14 @@ $(function () {
   $('.orientation-reset .orientation-random').css('cursor', 'pointer').click(function () { window.location.href = `${BASE_URI}/random` })
 
   /* search */
-  $('.explore-tab-content .w-form').hide()
+  $('.explore-tab-content:eq(0) .w-form').hide()
   const searchForm = $('<form style="margin-bottom: 15px"><input name="channel" type="hidden"><input name="q" type="text" class="w-input input-box" /></form>')
   searchForm.find('input[name=channel]').val(urlParams.get('channel'))
-  searchForm.find('input[name=q]').val(urlParams.get('q'))
+  // searchForm.find('input[name=q]').val(urlParams.get('q'))
   $.each(urlParams.getAll('tags[]'), function (i, tag) {
     searchForm.append(`<input name="tags[]" type="hidden" value="${tag}">`)
   })
-  searchForm.insertBefore('.explore-tab-content .w-form')
+  searchForm.insertBefore('.explore-tab-content:eq(0) .w-form')
 
   /* selected tags */
   $('.tags-showing-div .showing-tags').hide()
@@ -40,8 +41,7 @@ $(function () {
     const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
     selectedTag.text(`${tag} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-    selectedTag.css('color', '#ffffff')
-    selectedTag.css('background-color', '#A706FA')
+    selectedTag.addClass('js-selected-tag')
     selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
 
     if (i == 0) { $('<div class="arrow">></div>').appendTo('.orientation-map') } else { $('<div class="arrow">&</div>').appendTo('.orientation-map') }
@@ -54,7 +54,13 @@ $(function () {
   /* search term */
   if (urlParams.get('q')) {
     $('<div class="arrow">></div>').appendTo('.orientation-map')
-    $(`<div class="tag-orientation">${urlParams.get('q')}</div>`).appendTo('.orientation-map')
+    $(`<div class="tag-orientation">Search: ${urlParams.get('q')}</div>`).appendTo('.orientation-map')
+
+    const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
+    selectedTag.text(`${urlParams.get('q')} ×`)
+    selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]') })}` }).css('cursor', 'pointer')
+    selectedTag.addClass('js-selected-search-term')
+    selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
   }
 
   /* resources */
@@ -103,8 +109,7 @@ $(function () {
         tag.text(tagship.tag.name)
         if (urlParams.getAll('tags[]').includes(tagship.tag.name)) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagship.tag.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-          tag.css('color', '#ffffff')
-          tag.css('background-color', '#A706FA')
+          tag.addClass('js-selected-tag')
         } else {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]').concat([tagship.tag.name]), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
         }
@@ -122,8 +127,7 @@ $(function () {
     const selectedTag = $('.tags-showing-div .showing-tags').first().clone()
     selectedTag.text(`${channel_name} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ tags: urlParams.getAll('tags[]'), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-    selectedTag.css('color', '#000000')
-    selectedTag.css('background-color', '#FAC707')
+    selectedTag.addClass('js-selected-channel')
     selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
 
     $(`<div class="channel-orientation">${channel_name}</div>`).insertAfter('.orientation-map .all-orientation')
@@ -173,7 +177,7 @@ $(function () {
         tag.text(`${tagObj.name} (${tagObj.count})`)
         if (channel.name == urlParams.get('channel') && urlParams.getAll('tags[]').includes(tagObj.name)) {
           tag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tagObj.name }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
-          tag.addClass('selected')
+          tag.addClass('js-selected-tag')
         } else {
           const tags = (channel.name == urlParams.get('channel') ? urlParams.getAll('tags[]').concat([tagObj.name]) : [tagObj.name])
           tag.click(function () { window.location.href = `/?${$.param({ channel: channel.name, tags, q: urlParams.get('q') })}` }).css('cursor', 'pointer')
