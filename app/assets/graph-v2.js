@@ -1,51 +1,50 @@
 function drawNetwork () {
-  const scale = chroma.scale(['#ffffff', '#2500FF'])
+  const tag_color_scale = chroma.scale(['#ffffff', '#2500FF'])
 
+  const radar_bg_color = '#2500FF' // blue
+  const radar_border_color = '#2500FF' // blue
   const channel_bg_color = '#000000'
   const channel_border_color = '#2500FF' // blue
   const tag_bg_color = '#2500FF'
-  const tag_border_color = '#2500FF' // blue
+  // const tag_border_color = '#2500FF' // blue
   const link_bg_color = '#ffffff'
   const link_border_color = '#2500FF' // blue
 
+  const radar_edge_color = '#2500FF' // blue
+  const radar_edge_line_style = 'solid'
   const channel_edge_color = '#2500FF' // blue
   const channel_edge_line_style = 'solid'
-  const tag_edge_color = '#2500FF' // blue
-  const tag_edge_line_style = 'solid'
+  // const tag_edge_color = '#2500FF' // blue
+  // const tag_edge_line_style = 'solid'
   const link_edge_color = '#2500FF' // blue
   const link_edge_line_style = 'dashed'
 
+  const channel_max_weight = Math.max.apply(null, $(channels).map(function (i, channel) { return channel.weight }))
   const channel_min_width = 10
   const channel_width_multiplier = 10
-  const channel_min_color = 0.25
-  const channel_color_scale = Math.max.apply(null, $(channels).map(function (i, channel) { return channel.weight }))
+  // const channel_min_color = 0.25
   const channel_min_opacity = 1
-  const channel_opacity_scale = Math.max.apply(null, $(channels).map(function (i, channel) { return channel.weight }))
 
+  const tag_max_weight = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
   const tag_min_width = 10
   const tag_width_multiplier = 10
   const tag_min_color = 0.25
-  const tag_color_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
   const tag_min_opacity = 1
-  const tag_opacity_scale = Math.max.apply(null, $(tags).map(function (i, tag) { return tag.weight }))
 
+  const link_max_weight = Math.max.apply(null, $(links).map(function (i, link) { link.weight = 1; return link.weight }))
   const link_min_width = 2.5
   const link_width_multiplier = 10
   // const link_min_color = 0.25
-  const link_color_scale = Math.max.apply(null, $(links).map(function (i, link) { link.weight = 1; return link.weight }))
   const link_min_opacity = 1
-  const link_opacity_scale = Math.max.apply(null, $(links).map(function (i, link) { link.weight = 1; return link.weight }))
 
+  const edge_max_weight = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
   const edge_min_color = 1
-  const edge_color_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
   const edge_min_opacity = 0.1
-  const edge_opacity_scale = Math.max.apply(null, $(edges).map(function (i, edge) { return edge.weight }))
 
   const channel_data = $.map(channels, function (channel, i) {
-    let color
-    if (urlParams.get('channel') == channel.name) { color = channel_bg_color } else { color = scale(channel_min_color + (channel.weight / channel_color_scale)).hex() }
+    const color = channel_bg_color
 
-    let opacity = channel_min_opacity + (channel.weight / channel_opacity_scale)
+    let opacity = channel_min_opacity + (channel.weight / channel_max_weight)
     if (opacity > 1) opacity = 1
 
     if (urlParams.get('channel') != channel.name) {
@@ -57,7 +56,7 @@ function drawNetwork () {
           id: channel.name,
           name: channel.name,
           weight: channel.weight,
-          width: (channel_min_width + ((channel_min_width * channel_width_multiplier) * channel.weight / channel_color_scale)),
+          width: (channel_min_width + ((channel_min_width * channel_width_multiplier) * channel.weight / channel_max_weight)),
           'border-color': channel_border_color,
           color,
           opacity
@@ -68,9 +67,9 @@ function drawNetwork () {
 
   const tag_data = $.map(tags, function (tag, i) {
     let color
-    if (urlParams.getAll('tags[]').includes(tag.name)) { color = tag_bg_color } else { color = scale(tag_min_color + (tag.weight / tag_color_scale)).hex() }
+    if (urlParams.getAll('tags[]').includes(tag.name)) { color = tag_bg_color } else { color = tag_color_scale(tag_min_color + (tag.weight / tag_max_weight)).hex() }
 
-    let opacity = tag_min_opacity + (tag.weight / tag_opacity_scale)
+    let opacity = tag_min_opacity + (tag.weight / tag_max_weight)
     if (opacity > 1) opacity = 1
 
     if (urlParams.getAll('tags[]').length > 0 && !urlParams.getAll('tags[]').includes(tag.name)) {
@@ -82,7 +81,7 @@ function drawNetwork () {
           id: tag._id.$oid,
           name: tag.name,
           weight: tag.weight,
-          width: (tag_min_width + ((tag_min_width * tag_width_multiplier) * tag.weight / tag_color_scale)),
+          width: (tag_min_width + ((tag_min_width * tag_width_multiplier) * tag.weight / tag_max_weight)),
           'border-color': color,
           color,
           opacity
@@ -106,7 +105,7 @@ function drawNetwork () {
     ) {
       return null
     } else {
-      let opacity = edge_min_opacity + (edge.weight / edge_opacity_scale)
+      let opacity = edge_min_opacity + (edge.weight / edge_max_weight)
       if (opacity > 1) opacity = 1
 
       return {
@@ -115,7 +114,7 @@ function drawNetwork () {
           source: edge.source_id.$oid,
           target: edge.sink_id.$oid,
           weight: edge.weight,
-          color: scale(edge_min_color + (edge.weight / edge_color_scale)).hex(),
+          color: tag_color_scale(edge_min_color + (edge.weight / edge_max_weight)).hex(),
           opacity
         }
       }
@@ -126,7 +125,7 @@ function drawNetwork () {
     link.weight = 1
     const color = link_bg_color
 
-    let opacity = link_min_opacity + (link.weight / link_opacity_scale)
+    let opacity = link_min_opacity + (link.weight / link_max_weight)
     if (opacity > 1) opacity = 1
 
     return {
@@ -136,7 +135,7 @@ function drawNetwork () {
         name: link.data.title || truncate(link.data.description, 100, true) || truncate(link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''), 44),
         url: link.data.url,
         weight: link.weight,
-        width: (link_min_width + ((link_min_width * link_width_multiplier) * link.weight / link_color_scale)),
+        width: (link_min_width + ((link_min_width * link_width_multiplier) * link.weight / link_max_weight)),
         'border-color': link_border_color,
         color,
         opacity
@@ -195,7 +194,8 @@ function drawNetwork () {
         url: '/',
         weight: 1,
         width: 100,
-        color: '#A706FA',
+        'border-color': radar_border_color,
+        color: radar_bg_color,
         opacity: 1
       }
     })
@@ -209,8 +209,8 @@ function drawNetwork () {
             source: tag._id.$oid,
             target: 'RADAR',
             weight: 1,
-            color: tag_edge_color,
-            'line-style': tag_edge_line_style,
+            color: radar_edge_color,
+            'line-style': radar_edge_line_style,
             opacity: 0.5
           }
         })
