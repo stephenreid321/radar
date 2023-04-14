@@ -129,7 +129,7 @@ $(function () {
     selectedTag.addClass('js-selected-channel')
     selectedTag.insertBefore($('.tags-showing-div .showing-tags').first()).show()
 
-    $(`<div class="channel-orientation">${channel_name}</div>`).insertAfter('.orientation-map .all-orientation')
+    $(`<div class="channel-orientation">${channel_name.replace('📚｜', 'PLAY ')}</div>`).insertAfter('.orientation-map .all-orientation')
     $('<div class="arrow">></div>').insertAfter('.orientation-map .all-orientation')
   }
 
