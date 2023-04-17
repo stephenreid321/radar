@@ -2,7 +2,7 @@ $(function () {
   /* TODO */
   $('.explore-tabs-menu > a').last().hide() // share tab
   $('.explore-tab-content:eq(1)').remove()
-  $('.nav-banner').hide() // profile link
+  $('#profile, #logout').hide() // profile link
 
   $('.map-right-wrapper').css('width', '100%')
 
