@@ -64,9 +64,9 @@ class Link
       #{Tag.pluck(:name).join("\n")}
 
       # Link
-      Title: #{title}
+      #{"Title: #{title}" if title}
       URL: #{url}
-      Description: #{description}
+      #{"Description: #{description}" if description}
 
       ---
       Select up to 5 terms from the list of terms that are most relevant to the link.
@@ -76,13 +76,13 @@ class Link
   end
 
   def self.taggable
-    where(:title.ne => nil, :description.ne => nil)
+    self.and(:id.in => Link.and(:'data.title'.ne => nil).pluck(:id) + Link.and(:'data.description'.ne => nil).pluck(:id))
   end
 
   def set_tags!(attempt: 1, force: false)
     unless force
       return if tags && !tags.empty?
-      return unless title && description
+      return unless title || description
     end
 
     puts "tagging #{url} (attempt #{attempt})"
