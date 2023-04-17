@@ -2,7 +2,7 @@ $(function () {
   /* TODO */
   $('.explore-tabs-menu > a').last().hide() // share tab
   $('.explore-tab-content:eq(1)').remove()
-  $('a[href="/profile-page"]').hide() // profile link
+  $('.nav-banner').hide() // profile link
 
   $('.map-right-wrapper').css('width', '100%')
 
@@ -71,7 +71,9 @@ $(function () {
       resourceBlock.find('.resource-tldr').text('').html(link.data.title || truncate(link.data.description, 100, true) || truncate(link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, ''), 44))
 
       resourceBlock.find('.resource-source').text('').text(link.data.provider?.name || link.data.url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]).click(function () { window.open(link.data.url) }).css('cursor', 'pointer')
-      resourceBlock.find('.resource-curator').text('').text(`@${link.message.data.author.username}`).css('cursor', 'default')
+      resourceBlock.find('.resource-curator').text('').text(`@${link.message.data.author.username}`).css('cursor', 'default').css('margin-bottom', '10px')
+      const posted_at = new Date(link.posted_at).toLocaleString()
+      resourceBlock.find('.resource-curator').clone().text(`${posted_at}`).insertAfter(resourceBlock.find('.resource-curator'))
       resourceBlock.find('.resource-expanded-content').text('')
       if (link.data.description) { resourceBlock.find('.resource-expanded-content').html(`<p class="small-copy">${link.data.description}</p>`).click(function () { window.open(link.data.url) }).css('cursor', 'pointer') }
 

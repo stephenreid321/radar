@@ -22,7 +22,7 @@ class Channel
   end
 
   before_validation do
-    errors.add(:name, 'is invalid') unless (name =~ /\A[a-z]/i || name =~ /signals-and-research/i) && (name != ~ /intothefuture-promo-temp/i)    
+    errors.add(:name, 'is invalid') unless (name =~ /\A[a-z]/i || name =~ /signals-and-research/i) && !(name =~ /intothefuture-promo-temp/i)    
   end
 
   def tags_with_count    
