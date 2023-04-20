@@ -65,7 +65,8 @@ module Radar
     end
 
     get '/channels', cache: true, provides: :json do
-      cache_key { 'channels' }
+      expires 12.hours.to_i
+      cache_key { 'channels' }      
       channels = Channel.all.map do |channel|        
         {
           name: channel.name,
@@ -85,10 +86,12 @@ module Radar
     end
 
     get '/links/count', cache: true, provides: :json do
+      expires 12.hours.to_i
       { count: Link.count }.to_json
     end
 
     get '/links', cache: true, provides: :json do
+      expires 12.hours.to_i
       cache_key { "links-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       links = Link.order('posted_at desc')
       if params[:tags]
@@ -116,10 +119,12 @@ module Radar
     end
 
     get '/tags/count', cache: true, provides: :json do
+      expires 12.hours.to_i
       { count: Tag.count }.to_json
     end
 
     get '/tags', cache: true, provides: :json do
+      expires 12.hours.to_i
       cache_key { "tags-#{params[:channel]}-#{params[:tags].try(:sort)}-#{params[:q]}" }
       tags = if params[:tags]
                tag_ids = []
