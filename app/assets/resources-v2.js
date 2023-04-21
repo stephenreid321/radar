@@ -36,7 +36,7 @@ $(function () {
     selectedTag.text(`${tag} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: $.grep(urlParams.getAll('tags[]'), function (value) { return value != tag }), q: urlParams.get('q') })}` }).css('cursor', 'pointer')
     selectedTag.addClass('js-selected-tag')
-    selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
+    selectedTag.insertAfter($('.explore-tab-content:eq(0) .tags-showing-div .showing-tags').last()).show()
 
     if (i == 0) { $('<div class="arrow">></div>').appendTo('.orientation-map') } else { $('<div class="arrow">&</div>').appendTo('.orientation-map') }
     $(`<div class="tag-orientation">${tag}</div>`).appendTo('.orientation-map')
@@ -54,7 +54,7 @@ $(function () {
     selectedTag.text(`${urlParams.get('q')} ×`)
     selectedTag.click(function () { window.location.href = `/?${$.param({ channel: urlParams.get('channel'), tags: urlParams.getAll('tags[]') })}` }).css('cursor', 'pointer')
     selectedTag.addClass('js-selected-search-term')
-    selectedTag.insertAfter($('.tags-showing-div .showing-tags').last()).show()
+    selectedTag.insertAfter($('.explore-tab-content:eq(0) .tags-showing-div .showing-tags').last()).show()
   }
 
   /* resources */
