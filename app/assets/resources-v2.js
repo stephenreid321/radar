@@ -1,7 +1,7 @@
 $(function () {
   /* TODO */
-  $('.explore-tabs-menu > a').last().hide() // share tab
-  $('.explore-tab-content:eq(1)').remove()
+  // $('.explore-tabs-menu > a').last().hide() // share tab
+  // $('.explore-tab-content:eq(1)').remove()
   // $('#profile, #logout').hide() // profile link
 
   $('.map-right-wrapper').css('width', '100%')
