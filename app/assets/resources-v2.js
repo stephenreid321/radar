@@ -1,9 +1,4 @@
 $(function () {
-  /* TODO */
-  // $('.explore-tabs-menu > a').last().hide() // share tab
-  // $('.explore-tab-content:eq(1)').remove()
-  // $('#profile, #logout').hide() // profile link
-
   $('.map-right-wrapper').css('width', '100%')
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -186,7 +181,7 @@ $(function () {
         tag.appendTo(channelBlock.find('.tags-button-container')).show()
       })
 
-      channelBlock.appendTo('.channel-containter-scroll').show()
+      channelBlock.appendTo('.explore-tab-content:eq(0) .channel-containter-scroll').show()
     })
   })
 })
