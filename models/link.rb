@@ -80,10 +80,9 @@ class Link
   end
 
   def set_tags!(attempt: 1, force: false)
-    unless force
-      return if tags && !tags.empty?
-      return unless title || description
-    end
+    return if !force && (tags && !tags.empty?)
+
+    return unless title || description
 
     puts "tagging #{url} (attempt #{attempt})"
     openai_response = OPENAI.post('chat/completions') do |req|
