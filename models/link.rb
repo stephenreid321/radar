@@ -69,7 +69,7 @@ class Link
       #{"Description: #{description}" if description}
 
       ---
-      Select up to 5 terms from the list of terms that are most relevant to the link.
+      Select up to 3 terms from the list of terms that are most relevant to the link.
       IMPORTANT: Only select terms that are present in the list of terms.
       Return the result as a comma-separated list.
     )
@@ -86,7 +86,6 @@ class Link
     end
 
     puts "tagging #{url} (attempt #{attempt})"
-    n = 1
     openai_response = OPENAI.post('chat/completions') do |req|
       req.body = { model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: prompt }] }.to_json
     end
