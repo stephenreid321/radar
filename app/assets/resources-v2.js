@@ -181,6 +181,9 @@ $(function () {
         tag.appendTo(channelBlock.find('.tags-button-container')).show()
       })
 
+      channelBlock.find('.tags-button-container').hide()
+      channelBlock.find('.plus-icon').hide()
+
       channelBlock.appendTo('.explore-tab-content:eq(0) .channel-containter-scroll').show()
     })
   })

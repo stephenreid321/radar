@@ -41,7 +41,11 @@ module Radar
     end
 
     get '/' do
-      Faraday.get(ENV['WEBFLOW_URL']).body.gsub(ENV['DO_URL'], ENV['BASE_URI'])
+      Faraday.get(ENV['WEBFLOW_URL']).body
+             .gsub(ENV['DO_URL'], ENV['BASE_URI'])
+             .gsub('<script src="https://api.radardao.xyz/static/signals/header.js"></script>', '')
+             .gsub('<script src="https://api.radardao.xyz/static/signals/footer.js"></script>', '')
+             .gsub('<script src="https://api.radardao.xyz/static/signals/home.js"></script>', '')
     end
 
     get '/v1' do
@@ -66,8 +70,8 @@ module Radar
 
     get '/channels', cache: true, provides: :json do
       expires 12.hours.to_i
-      cache_key { 'channels' }      
-      channels = Channel.all.map do |channel|        
+      cache_key { 'channels' }
+      channels = Channel.all.map do |channel|
         {
           name: channel.name,
           id: channel.id,
@@ -105,9 +109,7 @@ module Radar
         end
         links = links.and(:id.in => link_ids)
       end
-      if params[:channel]
-        links = links.and(:message_id.in => Channel.find_by(name: params[:channel]).messages.pluck(:id))
-      end
+      links = links.and(:message_id.in => Channel.find_by(name: params[:channel]).messages.pluck(:id)) if params[:channel]
       if params[:q]
         links = links.and(:id.in => Link.or(
           { 'data.title': /\b#{params[:q]}\b/i },
